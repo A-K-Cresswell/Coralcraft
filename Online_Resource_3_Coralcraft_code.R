@@ -43,6 +43,8 @@ infrequent = 52*5
 freq.low = infrequent # 99999 OR frequent OR infrequent
 freq.high = infrequent # 99999 OR frequent OR infrequent
 
+bleach.freq = 99999
+
 # background mortality paramters ----
 background.mort = 0.001 # base probability 99% chance of surviving a year
 background.mort2 = 0.005 # lower probability, 95%, for encrusting due to being on the bottom
@@ -131,10 +133,10 @@ for (run in 1:runs){ # multiple simulation runs
   
   # set up functional types information ----
   nfts = length(ftcelllist) # set number of functional groups (e.g. tabular, columnar, massive, encrusting)
-  ftypes = data.frame(names = c("encrusting", "hemispherical", "tabular", "branching", "corymbose"))  
-  ftypes$ftnum = 1:nrow(ftypes)
+  ftypes = data.frame(names = c("encrusting", "hemispherical", "tabular", "branching", "corymbose", "branching-super"))  
+  ftypes$ftnum = c(1,2,3,4,5,4)
   ftypes$resource.to.growth = 1 # this can be modified to change growth rates
-  ftsinc_list = c("encrusting", "hemispherical", "tabular", "branching", "corymbose") # select which functional types to include
+  ftsinc_list = c("encrusting", "hemispherical", "tabular", "branching", "corymbose", "branching-super") # select which functional types to include
   
   ftsinc = subset(ftypes, names %in% ftsinc_list) # subset from the full possible list
   nftsinc = nrow(ftsinc)
@@ -147,7 +149,8 @@ for (run in 1:runs){ # multiple simulation runs
     ft = rep(ftsinc$ftnum, length.out = n.initial.colonies), # ORDERED SAMPLE
     #ft =  sample(c(ftsinc$ftnum,ftsinc$ftnum), n.initial.colonies, replace = T), # RANDOM SAMPLE
     age = 1,
-    res = start.res)
+    res = start.res,
+    super = c(0,0,0,0,0,0,0,0,0,1)) # specify which are super corals in the start
   
   colonymap$row = rows
   colonymap$col = cols
@@ -424,8 +427,33 @@ for (run in 1:runs){ # multiple simulation runs
         nlooplight = 50
       }
     }
-    
-    
+
+    # Bleaching mortality  ----
+    if ((randomdist == "fixed" & ts%%bleach.freq == 0 & nrow(colonymap) >0 ) | (randomdist != "fixed" & runif(1) < (1/bleach.freq) & nrow(colonymap) >0) ) { # run this code when timestep is a multiple of set fixed frequency, or in the random case, make a random selection around this
+      print(paste("low intensity ", randomdist))
+    if (nrow(colonymap) > 0) {
+      probremoveeach = rep(bleaching.mort.standard , length(colonymap$ft))
+      
+      probremoveeach[colonymap$ft==1] = bleaching.mort.super #super corals
+      whichremove = runif(length(probremoveeach)) < probremoveeach
+      colonyremove = subset(colonymap, whichremove  ) # remove rows where csf > disturbance intensity # csf is its vulnerability. higher is more vulnerable.
+      colonymap = subset(colonymap, !whichremove ) 
+      # set world to zero and dead to FALSE for these new cells
+      # world contains the colony id. If colonyid is in colonyremove world should be set to zero
+      for (i in colonyremove$colonyid) {
+        print(paste("natural mortality removing", i))
+        dead[world == i] = 0 # set dead world to zero where disturbed colonies have been removed
+        world[world == i] = 0 # set world to zero where disturbed colonies have been removed
+      }
+      if (nrow(colonyremove )>0){
+        thisfatesrec = colonyremove 
+        thisfatesrec$fate="random"
+        thisfatesrec$deathtime=ts
+        fatesrec = rbind(fatesrec ,thisfatesrec )
+        nlooplight = 50
+      }
+    }    
+    }
     
     # Disturbance low intensity fixed OR random ----
   if ((randomdist == "fixed" & ts%%freq.low == 0 & nrow(colonymap) >0 ) | (randomdist != "fixed" & runif(1) < (1/freq.low) & nrow(colonymap) >0) ) { # run this code when timestep is a multiple of set fixed frequency, or in the random case, make a random selection around this
@@ -551,3 +579,4 @@ legend('topleft',c(as.character(ftypes$names),'dead'),col=1:6,lty=1:6, cex = 0.3
 write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
 paste("ftypessaveall exported")
 } # End of multiple runs loop
+
