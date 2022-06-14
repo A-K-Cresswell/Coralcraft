@@ -18,10 +18,12 @@ colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet", "grey")
 # for export naming ----
 version = paste(Sys.Date())
 
+# libaries 
+library(rgl)
 # 1. set parameters ----
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
-timesteps = 52*100  # the number of timesteps in each simulation
+timesteps = 52*100  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
 mindepth = 0 #(m) # used to calc top of world light level
@@ -62,7 +64,7 @@ start.res = 1 # resources each colony starts with
 
 
 # 2. source growth form information ----
-source('Online_Resource_1_Coral_morphology_design.R') ## need to run this once to load the growth forms
+source('Coral_morphology_design_5_original.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
 
 
