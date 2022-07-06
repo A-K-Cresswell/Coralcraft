@@ -11,7 +11,7 @@
 
 # Online Resource 1 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
-#library(rgl)
+library(rgl)
 
 # This script is a source file. It creates the possible morphologies by specifying the possible voxels the coral may grow into, as referenced to a starting voxel
 
@@ -108,21 +108,21 @@ for (i in 1:length(ftcelllist)){
 }
 
 
-# Plot each for in rgl at set radius (you will need to load the rgl package to do this)
-# colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
+#Plot each for in rgl at set radius (you will need to load the rgl package to do this)
+colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
 
-# for (i in (1:5)) {
-# tcl = ftcelllist[[i]] # choose one to plot
-# max(tcl)
-# inds = which(tcl>960,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
-# inds
-# open3d()
-# spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])#,alpha=0.9,coralpolyps$sz*0.7)
-# }
+for (i in (1:5)) {
+ tcl = ftcelllist[[i]] # choose one to plot
+ max(tcl)
+ inds = which(tcl>960,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
+ inds
+ #open3d()
+ #spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])#,alpha=0.9,coralpolyps$sz*0.7)
+ }
 
 # note, you can use your mouse to move around the colony in the rgl window
 
-save(ftcelllist,file="ftcelllist")
+save(ftcelllist, file="ftcelllist")
 
 
 

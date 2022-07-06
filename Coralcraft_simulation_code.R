@@ -12,6 +12,7 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
+setwd("C:/Users/OH012/Documents/GitHub/Coralcraft")
 colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
 colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet", "grey")
 
@@ -20,10 +21,12 @@ version = paste(Sys.Date())
 
 # libaries 
 library(rgl)
+library(scatterplot3d)
+
 # 1. set parameters ----
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
-timesteps = 52*100  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
+timesteps = 52 #52*100  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
 mindepth = 0 #(m) # used to calc top of world light level
@@ -64,9 +67,8 @@ start.res = 1 # resources each colony starts with
 
 
 # 2. source growth form information ----
-source('Coral_morphology_design_5_original.R') ## need to run this once to load the growth forms
+#source('Coral_morphology_design_5_original.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
-
 
 
 # make new folder with name giving parameters for automatically saving outputs ----
@@ -78,10 +80,11 @@ foldername = paste(version, randomdist, timesteps, "tss", runs, "runs", spawn.fr
 thisoutput = paste(getwd(), foldername, sep="/")
 setwd(thisoutput)
 
+
 # plotting parameters ----
 draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
 save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
-drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
+drawscatter = 1 # will plot and save a scatterplot - not currently set up (see figure script)
 r3dDefaults$windowRect = c(50,50,700,700) # increase size of rgl window for better resolution when saving
 #       # To save with new orientation of rgl window:
 #       # Open rgl and move to desired orientation then save with below
@@ -500,7 +503,7 @@ for (run in 1:runs){ # multiple simulation runs
   # Plot and save rgl within loop? ----
     #Note this will slow the simulation a lot
   if (draw == 1 & run == 1) { # if you want to plot in 3D
-    par3d(userMatrix = uM3, zoom=1)
+    #par3d(userMatrix = uM3, zoom=1)
     loc = which(world > 0,arr.ind = TRUE)
     ids = world[which(world>0)]
     ifdead = dead[which(world>0)]
@@ -550,6 +553,6 @@ legend('topleft',c(as.character(ftypes$names),'dead'),col=1:6,lty=1:6, cex = 0.3
 }# End of simulation loop
 
 # Save scores of cells, cover and no. colonies
-write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
-paste("ftypessaveall exported")
+#write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
+#paste("ftypessaveall exported")
 } # End of multiple runs loop
