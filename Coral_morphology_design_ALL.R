@@ -13,7 +13,8 @@ library(rgl)
 
 #----------------------------------------------------------------------------------------
 ftcelllist=list() # make an empty list
-allcells = data.frame(expand.grid(x=(-ws/2):(ws/2),y=(-ws/2):(ws/2),z=1:depth)) #ws/2 puts in the middle of the world
+#allcells = data.frame(expand.grid(x=(-ws/2):(ws/2),y=(-ws/2):(ws/2),z=1:depth)) #ws/2 puts in the middle of the world
+allcells = data.frame(expand.grid(x=(-ws/2):(ws/2),y=(-ws/2):(ws/2),z=1:ws))
 head(allcells)
 
 allcells$dist1 = sqrt((allcells$x)^2 + (allcells$y)^2 + (allcells$z)^2)
@@ -50,13 +51,13 @@ thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[5]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist)
 
-### 7. short tabular
+### 6. short tabular
 thiscelllist = subset(allcells, (dist2 <= 3 & z<8) | z==8 ) 
 thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[6]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist )
 
-### 6. medium tabular
+### 7. medium tabular
 thiscelllist = subset(allcells, (dist2 <= 3 & z<12) | z==12 ) 
 thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[7]] = thiscelllist[-c(4:5)]  
@@ -187,19 +188,31 @@ for (i in 1:length(ftcelllist)){
 library(Matrix)
 #### turn into arrays
 for (i in 1:length(ftcelllist)){
-  m1 = array(0,dim=c(ws,ws,depth))
+  m1 = array(0,dim=c(ws,ws,ws))
   inds = as.matrix((ftcelllist[[i]])[,1:3])
   inds[,1:2] = inds[,1:2] + ws/2
   m1[inds] = 999-ftcelllist[[i]]$pr
   ftcelllist[[i]] = m1
 }
 
+# 
+# tcl = ftcelllist[[5]]
+# max(tcl)
+# inds = which(tcl>999,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
+# inds
+# spheres3d(inds [,1],inds [,2],inds [,3], col='red')#,alpha=0.9,coralpolyps$sz*0.7)
 
-tcl = ftcelllist[[5]]
-max(tcl)
-inds = which(tcl>999,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
-inds
-spheres3d(inds [,1],inds [,2],inds [,3], col='red')#,alpha=0.9,coralpolyps$sz*0.7)
+#Plot each for in rgl at set radius (you will need to load the rgl package to do this)
+colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
+
+for (i in (1:15)) {
+  tcl = ftcelllist[[i]] # choose one to plot
+  max(tcl)
+  inds = which(tcl>960,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
+  inds
+  #open3d()
+  #spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])#,alpha=0.9,coralpolyps$sz*0.7)
+}
 
 save(ftcelllist,file="ftcelllist")
 
