@@ -12,9 +12,13 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
-setwd("C:/Users/OH012/Documents/GitHub/Coralcraft")
-colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
-colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet", "grey")
+setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft")
+colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
+           "red4", "yellow2", "aquamarine3", "skyblue3", "slateblue",
+           "salmon", "orange", "olivedrab3","powderblue", "orchid1")
+colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet", 
+           "red4", "yellow2", "aquamarine3", "skyblue3", "slateblue",
+           "salmon", "orange", "olivedrab3","powderblue", "orchid1", "grey")
 
 # for export naming ----
 version = paste(Sys.Date())
@@ -26,7 +30,7 @@ library(scatterplot3d)
 # 1. set parameters ----
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
-timesteps = 52*100  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
+timesteps = 52*3  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
 mindepth = 0 #(m) # used to calc top of world light level
@@ -34,7 +38,7 @@ n.initial.colonies = 10  # how many corals in the beginning - initial size is on
 
 # set spawning parameters ----
 randomrecruits = 1 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
-spawn.freq = 52 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
+spawn.freq = 1 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
 nnewrecruits= 5 # how many new corals each spawn (could make random)
 
 # set disturbance parameters ----
@@ -82,9 +86,9 @@ setwd(thisoutput)
 
 
 # plotting parameters ----
-draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
-save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
-drawscatter = 1 # will plot and save a scatterplot - not currently set up (see figure script)
+draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
+save3D = 1 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
+drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
 r3dDefaults$windowRect = c(50,50,700,700) # increase size of rgl window for better resolution when saving
 #       # To save with new orientation of rgl window:
 #       # Open rgl and move to desired orientation then save with below
@@ -136,16 +140,13 @@ for (run in 1:runs){ # multiple simulation runs
   
   # set up functional types information ----
   nfts = length(ftcelllist) # set number of functional groups (e.g. tabular, columnar, massive, encrusting)
-  ftypes = data.frame(names = c("encrusting", "hemispherical", "flexi-hemispherical",
-                                "column","cone",
-                                "short tabular", "med tabular", "tall tabular",
-                                "branching", "branching 2", 
-                                "digitate", "waffle",
-                                "corymbose 1", "corymbose 2", "corymbose 3"))  
+  ftypes = data.frame(names = c("encrusting", "hemispherical", "flexi-hemispherical", "column","cone",
+                                "short tabular", "med tabular", "tall tabular", "branching", "branching 2", 
+                                "digitate", "waffle", "corymbose 1", "corymbose 2", "corymbose 3"))  
   ftypes$ftnum = 1:nrow(ftypes)
   ftypes$resource.to.growth = 1 # this can be modified to change growth rates
-  ftsinc_list = c("encrusting", "hemispherical", "med tabular",
-                  "column","waffle") # select which functional types to include
+  ftsinc_list = c("encrusting", "hemispherical", "flexi-hemispherical", "column","cone",
+                  "med tabular", "branching 2","corymbose 2","digitate") # select which functional types to include
   
   ftsinc = subset(ftypes, names %in% ftsinc_list) # subset from the full possible list
   nftsinc = nrow(ftsinc)
@@ -535,8 +536,8 @@ for (run in 1:runs){ # multiple simulation runs
     ftss = unlist(sapply(ids , function(thisid) {
       colonymap$ft[colonymap$colonyid == thisid]
     }))
-    ftss[ifdead==1] = 6
-    png(paste(timesteps + 1000, ".png"), width = 20, height = 20, units = "cm", res = 200) #change ts to timesteps to save ONLY final plot   
+    ftss[ifdead==1] = 16
+    png(paste(ts + 1000, ".png"), width = 20, height = 20, units = "cm", res = 200) #change ts to timesteps to save ONLY final plot   
     scatterplot3d(
       loc[,1], loc[,2], loc[,3],
       color=colpal2[ftss], ##[coralpolyps$ft],

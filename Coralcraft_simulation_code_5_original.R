@@ -12,7 +12,7 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
-setwd("C:/Users/OH012/Documents/GitHub/Coralcraft")
+setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft")
 colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
 colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet", "grey")
 
@@ -26,16 +26,16 @@ library(scatterplot3d)
 # 1. set parameters ----
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
-timesteps = 52 #52*100  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
+timesteps = 52*10  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
 mindepth = 0 #(m) # used to calc top of world light level
 n.initial.colonies = 10  # how many corals in the beginning - initial size is one block each (i.e. 1cm x 1cm)
 
 # set spawning parameters ----
-randomrecruits = 1 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
-spawn.freq = 52 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
-nnewrecruits= 5 # how many new corals each spawn (could make random)
+randomrecruits = 5 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
+spawn.freq = 1 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
+nnewrecruits= 1 # how many new corals each spawn (could make random)
 
 # set disturbance parameters ----
 randomdist = "fixed" # fixed or random disturbance intensity and frequency?
@@ -82,9 +82,9 @@ setwd(thisoutput)
 
 
 # plotting parameters ----
-draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
-save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
-drawscatter = 1 # will plot and save a scatterplot - not currently set up (see figure script)
+draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
+save3D = 1 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
+drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
 r3dDefaults$windowRect = c(50,50,700,700) # increase size of rgl window for better resolution when saving
 #       # To save with new orientation of rgl window:
 #       # Open rgl and move to desired orientation then save with below
