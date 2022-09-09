@@ -19,8 +19,8 @@ ftcelllist=list() # make an empty list
 allcells = data.frame(expand.grid(x=(-ws/2):(ws/2),y=(-ws/2):(ws/2),z=1:ws))
 head(allcells)
 
-allcells$dist1 = sqrt((allcells$x)^2 + (allcells$y)^2 + (allcells$z)^2) 
-allcells$dist2 = sqrt((allcells$x)^2 + (allcells$y)^2) #radius
+allcells$dist1 = sqrt((allcells$x)^2 + (allcells$y)^2 + (allcells$z)^2)
+allcells$dist2 = sqrt((allcells$x)^2 + (allcells$y)^2)
 
 ### 1. encrusting
 thiscelllist = subset(allcells , z==1)
@@ -97,22 +97,20 @@ thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[10]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist )
 
-### 11. digitate (same shape as flexi-hemisphere no.3)
-r=2
-thiscelllist = subset(allcells, (x%%4==0 & y%%4==0) | z==1 ) #grid of colony
-thiscelllist$pr = sqrt(thiscelllist$x^2 + thiscelllist$y^2 + r * thiscelllist$z^2) #shape of single colony
-ftcelllist[[11]] = thiscelllist[-c(4:5)] 
+### 12. digitate
+thiscelllist = subset(allcells, (x%%4==0 & y%%4==0) | z==1 ) 
+thiscelllist$pr = thiscelllist$dist1
+ftcelllist[[11]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist)
 
-
-### 12. digitate2 / waffle says libby
+### 13. digitate2 / waffle says libby
 thiscelllist = subset(allcells, (x%%4==0 & y%%4==0) | (z==1 & (x%%4==0 | y%%4==0))) 
 thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[12]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist)
 
 
-### 13. branching 3
+### 11. branching 3
 ok = (allcells$x == 0 & allcells$y == 0)
 ok1 = (allcells$y == 0 & allcells$x == allcells$z)
 ok2 = (allcells$x == 0 & allcells$y == allcells$z)
@@ -287,7 +285,7 @@ setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft/Coral Morphol
 #Plot each for in rgl at set radius (you will need to load the rgl package to do this)
 colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
 
-for (i in (11)) {
+for (i in (18)) {
   tcl = ftcelllist[[i]] # choose one to plot
   max(tcl)
   inds = which(tcl>960,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
