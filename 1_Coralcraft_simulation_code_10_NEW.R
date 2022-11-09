@@ -12,9 +12,11 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
-setwd("C:/Users/OH012/Documents/GitHub/Coralcraft")
-colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet")
-colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet", "grey")
+setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft")
+colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
+           "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange")
+colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
+           "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange","grey")
 
 # for export naming ----
 version = paste(Sys.Date())
@@ -26,7 +28,7 @@ library(scatterplot3d)
 # 1. set parameters ----
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
-timesteps = 52 #52*100  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
+timesteps = 52*3  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
 mindepth = 0 #(m) # used to calc top of world light level
@@ -34,7 +36,7 @@ n.initial.colonies = 10  # how many corals in the beginning - initial size is on
 
 # set spawning parameters ----
 randomrecruits = 1 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
-spawn.freq = 52 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
+spawn.freq = 1 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
 nnewrecruits= 5 # how many new corals each spawn (could make random)
 
 # set disturbance parameters ----
@@ -45,8 +47,8 @@ if(randomdist == "fixed") disturbance.intensity.high = c(1.5,1.5,1.5) else distu
 # frequency
 frequent = 26
 infrequent = 52*5  
-freq.low = infrequent # 99999 OR frequent OR infrequent
-freq.high = infrequent # 99999 OR frequent OR infrequent
+freq.low = 99999 # 99999 OR frequent OR infrequent
+freq.high = 99999 # 99999 OR frequent OR infrequent
 
 # background mortality paramters ----
 background.mort = 0.001 # base probability 99% chance of surviving a year
@@ -67,7 +69,7 @@ start.res = 1 # resources each colony starts with
 
 
 # 2. source growth form information ----
-#source('Coral_morphology_design_5_original.R') ## need to run this once to load the growth forms
+#source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
 
 
@@ -84,8 +86,8 @@ setwd(thisoutput)
 # plotting parameters ----
 draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
 save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
-drawscatter = 1 # will plot and save a scatterplot - not currently set up (see figure script)
-r3dDefaults$windowRect = c(50,50,700,700) # increase size of rgl window for better resolution when saving
+drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
+r3dDefaults$windowRect = c(50,50,500,500) # increase size of rgl window for better resolution when saving
 #       # To save with new orientation of rgl window:
 #       # Open rgl and move to desired orientation then save with below
 #       # uM <- par3d()$userMatrix
@@ -136,14 +138,16 @@ for (run in 1:runs){ # multiple simulation runs
   
   # set up functional types information ----
   nfts = length(ftcelllist) # set number of functional groups (e.g. tabular, columnar, massive, encrusting)
-  ftypes = data.frame(names = c("encrusting", "hemispherical", "tabular", "branching", "corymbose"))  
+  ftypes = data.frame(names = c("encrusting", "flexi-hemispherical", "digitate", "corymbose", "thick tabular",
+                                "mushroom", "fingers", "sheet", "hedgehog", "staghorn"))  #new morphologies
   ftypes$ftnum = 1:nrow(ftypes)
   ftypes$resource.to.growth = 1 # this can be modified to change growth rates
-  ftsinc_list = c("encrusting", "hemispherical", "tabular", "branching", "corymbose") # select which functional types to include
+  ftsinc_list = c("encrusting", "flexi-hemispherical", "digitate", "corymbose", "thick tabular",
+                  "mushroom", "fingers", "sheet", "hedgehog", "staghorn") # select which functional types to include
   
   ftsinc = subset(ftypes, names %in% ftsinc_list) # subset from the full possible list
   nftsinc = nrow(ftsinc)
-  
+ 
   # make the colony map ----
   ftlist = as.list(ftsinc$ftnum)
   colonymap = data.frame(
@@ -516,7 +520,7 @@ for (run in 1:runs){ # multiple simulation runs
     shade3d(qmesh3d(verticesside, indices),color='grey')
     text3d(-6,-6,0,paste('Time step', ts))
     if (save3D == 1) {
-      rgl.snapshot(paste(version, ts + 1000, "final.png"))
+      rgl.snapshot(paste(version, ts, "final.png"))
     }
     rgl.close()
   }
@@ -529,8 +533,8 @@ for (run in 1:runs){ # multiple simulation runs
     ftss = unlist(sapply(ids , function(thisid) {
       colonymap$ft[colonymap$colonyid == thisid]
     }))
-    ftss[ifdead==1] = 6
-    png(paste(ts + 1000, ".png"), width = 20, height = 20, units = "cm", res = 200)    
+    ftss[ifdead==1] = 16
+    png(paste(timesteps + 1000, ".png"), width = 20, height = 20, units = "cm", res = 200) #change ts to timesteps to save ONLY final plot   
     scatterplot3d(
       loc[,1], loc[,2], loc[,3],
       color=colpal2[ftss], ##[coralpolyps$ft],
@@ -538,6 +542,8 @@ for (run in 1:runs){ # multiple simulation runs
       pch = 16) 
     dev.off()
   }
+    
+    
     
 # Base R plots in each timestep to track progress ----
 	par(mfrow=c(2,2))
@@ -549,10 +555,14 @@ dim(coversummary )
 matplot(t(coversummary/100),t='l',xlab = "timestep", ylab  ="cover")
 legend('topleft',c(as.character(ftypes$names),'dead'),col=1:6,lty=1:6, cex = 0.3)
  print(colonymap) 
+ 
+ ### output colony structure for new metrics
+ if (ts%%52==0) save(light,dead,world , file = paste("worlds",ts,run))
+
   
 }# End of simulation loop
 
 # Save scores of cells, cover and no. colonies
-#write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
-#paste("ftypessaveall exported")
+ write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
+paste("ftypessaveall exported")
 } # End of multiple runs loop
