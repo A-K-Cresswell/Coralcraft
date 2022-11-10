@@ -4,6 +4,7 @@
 # Authors
 # Michael Renton
 # Anna K Cresswell
+# Daphne Oh
 
 # For inquires contact annacresswell@gmail.com
 
@@ -12,7 +13,9 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
-setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft")
+#setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft")
+setwd("~/GitHub/Coralcraft")
+
 colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
            "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange")
 colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
@@ -36,7 +39,7 @@ n.initial.colonies = 10  # how many corals in the beginning - initial size is on
 
 # set spawning parameters ----
 randomrecruits = 1 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
-spawn.freq = 1 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
+spawn.freq = 1 # 52 is annually --- how frequently (in timesteps) does spawning occur (set to high number for no spawning)
 nnewrecruits= 5 # how many new corals each spawn (could make random)
 
 # set disturbance parameters ----
@@ -222,6 +225,7 @@ for (run in 1:runs){ # multiple simulation runs
       }
       
       colonymap = subset(colonymap, stillalive) 	# drop the fully dead colonies out of the colony map 
+      # in future versions may want to return these as 'dead structure' for some timesteps
       
       ### Growth ----
       ncolonies = nrow(colonymap)
