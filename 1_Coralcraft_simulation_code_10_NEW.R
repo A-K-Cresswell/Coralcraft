@@ -13,8 +13,8 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
-#setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft")
-setwd("~/GitHub/Coralcraft")
+setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft") # Daph's working directory
+#setwd("~/GitHub/Coralcraft") # Anna's working directory
 
 colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
            "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange")
