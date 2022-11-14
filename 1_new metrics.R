@@ -1,10 +1,11 @@
-
-
-
-ts=52*3
+ts=52*10
 run=1
 
 load( file = paste("worlds",ts,run))
+
+image(world[,,1])
+world11 = world==5
+image(apply(world11,c(1,2),any ))
 
 dim(world)
 dim(dead)
@@ -36,7 +37,11 @@ image(allcovered)
 
 countcoveredpixels = function(slice){
   covered = 0
-  if (any(slice)) covered = sum(cumsum(slice)==0)
+  if (any(slice)) {
+	slicei = which(slice)
+	top = max(slicei)
+	covered = sum(!slice[1:top])
+	}
   covered
 }
 
@@ -54,6 +59,56 @@ plot(cc)
 
 #################################################
 
+############
+
+### covered cells from sides
+
+par(mfrow=c(2,3))
+image(world2[,,1])
+allcovered = apply(world2,c(1,2),countcoveredpixels )
+image(allcovered)
+az=which(world2[,,1],arr.ind=T)
+#points(az[,1]/100,az[,2]/100,pch=16,cex=0.1)
+allcovered = apply(world2,c(1,3),countcoveredpixels )
+image(allcovered)
+allcovered = apply(world2,c(1,3),countcoveredpixels2 )
+image(allcovered)
+allcovered = apply(world2,c(2,3),countcoveredpixels )
+image(allcovered)
+allcovered = apply(world2,c(2,3),countcoveredpixels2 )
+image(allcovered)
+
+
+countcoveredpixels2 = function(slice){
+  covered = 0
+  if (any(slice)) {
+	slicei = which(rev(slice))
+	top = max(slicei)
+	covered = sum(!rev(slice)[1:top])
+	}
+  covered
+}
+
+getnumcoveredcellssides = function(run,ts){
+  print(ts)
+  load( file = paste("worlds",ts,run))
+  world2 = world > 0 | dead > 0
+  allcovered = apply(world2,c(2,3),countcoveredpixels2 )
+  c1 = sum(allcovered)
+  allcovered = apply(world2,c(1,3),countcoveredpixels )
+  c2 = sum(allcovered)
+  allcovered = apply(world2,c(1,3),countcoveredpixels2 )
+  c3 = sum(allcovered)
+  allcovered = apply(world2,c(2,3),countcoveredpixels )
+  c4 = sum(allcovered)
+  (c1+c2+c3+c4)/4
+}
+
+getnumcoveredcellssides(1,52)/ws/ws
+getnumcoveredcellssides(1,104)/ws/ws
+getnumcoveredcellssides(1,52*4)/ws/ws
+######################################################
+
 ## height-volume profile/ top-heaviness?
 
 load( file = paste("worlds",ts,run))
@@ -67,9 +122,7 @@ lines(volbylayer,1:ws,col='red')
 
 ###########################################
 
-#Visibility 
-
-
+#Visibility - top view
 
 visibility2 = array(0,c(ws,ws,ws))
 
@@ -175,7 +228,49 @@ image(sheltered2[,,5],zlim=c(0,mx))
 image(sheltered2[,,10],zlim=c(0,mx))
 image(sheltered2[,,12],zlim=c(0,mx))
 
+### shelter v height
 shh=apply(sheltered,3,mean)
 plot(shh,t='l')
 shh2=apply(sheltered2,3,mean)
 lines(shh,col='red')
+
+############################################################
+## pixel to pixel
+############################################################
+
+isLoS = function(a,b){
+	ans = F
+	leng = sqrt(sum((a-b)^2))
+	npts = round(leng*10)
+	ptmat = cbind(seq(a[1],b[1],length.out=npts) , seq(a[2],b[2],length.out=npts), seq(a[3],b[3],length.out=npts) )
+	ptmat = round(ptmat)
+	if (!any(world2[ptmat])) ans = T
+	ans
+}
+
+### test from ocean floor to mid point of top
+
+resmat = matrix(NA, nrow=ws,ncol=ws)
+for (i in 1:ws) for (j in 1:ws){
+	resmat[i,j] = isLoS(c(i,j,1) , c(50,50,100))	
+}
+image(resmat)
+
+### test from ocean floor to all of top
+
+resmat = array(NA, c(ws,ws,ws*ws))
+iii=0
+for (ii in seq(1,ws,by=10)) for (jj in seq(1,ws,by=10)){
+iii=iii+1
+print(iii)
+for (i in 1:ws) for (j in 1:ws){
+	resmat[i,j,iii] = isLoS(c(i,j,1) , c(ii,jj,100))	
+}
+}
+dim(resmat)
+resmat2 = apply(resmat[,,1:100],c(1,2),mean)
+dim(resmat2)
+image(resmat2)
+
+
+
