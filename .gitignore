@@ -3,6 +3,7 @@
 *.Rda
 *.png
 *.pdf
-*.csv
 *.nc
+*.gif
 .Rhistory
+
