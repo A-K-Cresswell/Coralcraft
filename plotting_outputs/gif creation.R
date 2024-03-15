@@ -29,5 +29,20 @@ list.files(pattern = "*final.png", full.names = T) %>% # find the saved temporal
 # file.remove(list.files(pattern=".png")) # remove the fi
 
 
-# NOTE: This seems to create multiple large temporary files and not delete them:
+setwd("C:/Users/acresswe/Australian Institute of Marine Science/RRAP M&DS - 2_DataWorkflows/IPMF/model_runs/Counterfactuals_Jan23/plots/MapAnimations/30141")
+# this last bit isn't working on big computer?
+# set your workng directory to where your files are located
+list.files(pattern = "*map.png", full.names = T) %>% # find the saved temporal images
+  image_read() %>% # reads each path file
+  image_join() %>% # joins image
+  image_animate(fps=10) %>% # animates, can opt for number of loops
+  image_write("C-scape.gif") # write to current dir
+# file.remove(list.files(pattern=".png")) # remove the fi
+
+
+
+
+
+
+# NOTE: This seems to create multiple large temporary files and not delete them, e.g. check:
 C:\Users\acresswe\AppData\Local\Temp\RtmpWyEYhU
