@@ -1,7 +1,73 @@
-ts=52*10
-run=1
 
-load( file = paste("worlds",ts,run))
+
+
+#### To create heat maps
+
+
+##############################################
+library(animation)
+library(scatterplot3d)
+library(rgl)
+library(magick)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+library(png)
+library(raster)
+library(ggpubr)
+
+colpal = c("firebrick4", "navy", "plum4",
+           "tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
+           "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange")
+
+## Read metrics code before proceeding
+work.dir = paste("~/1_Writing/1_Chapter 1_Coralcraft/00_model")
+sim.wd = paste(work.dir,"1_Simulations", "1_Outputs", "2_Scenarios", sep="/")
+met.wd = paste(work.dir,"2_Metrics", sep="/")
+script = paste(met.wd,"1_MetricsScripts", sep="/") 
+output = paste(met.wd, "1_Outputs", sep="/") 
+
+#simpsons ----
+simp = function(x) 1- (x(x-1) / sum(x)(sum(x)-1))
+simp = function(x) {
+  N=sum(x)
+  1- sum (   x*(x-1) / (N*(N-1)))
+}
+simp2 = function(x) {
+  N=sum(x)
+  1- sum (   (x / N)^2)
+}
+# use simp2 
+
+#####################################################################################################
+
+#### read in scenario file ####
+setwd(work.dir)
+scens.id=read.csv("scenarios_id.csv")
+scens.csv=read.csv("scenarios.csv", header=T)
+fts=read.csv("growth forms.csv")
+
+# # to select growth forms from scenarios (needed for simulation code)
+# sel.fts <- scens.csv[scens] 
+# sel.fts <- as.numeric(na.omit(as.vector(unlist(sel.fts))))
+# labels = as.vector(subset(fts, id %in% sel.fts))
+###################################################################################################
+
+### Load Individual Scenarios ####
+sc.lab = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##CHANGE SCENARIO HERE
+id = sc.lab$id
+scens = sc.lab$scenario
+name = sc.lab$names
+foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-03", "v2", sep = "_") #CHANGE DATE HERE
+readfile = paste(sim.wd, foldername, sep="/")
+setwd(readfile)
+
+timesteps = 52*5
+run = 1
+ws=100
+
+load(file = paste(id, scens, "worlds",timesteps,run, sep = "_")) ## change ts & run according
 
 image(world[,,1])
 world11 = world==5
@@ -31,67 +97,39 @@ countcoveredpixels(world2[1,44,])
 allcovered = apply(world2,c(1,2),countcoveredpixels )
 image(allcovered)
 
-###############
-
-### covered cells
-
-countcoveredpixels = function(slice){
-  covered = 0
-  if (any(slice)) {
-	slicei = which(slice)
-	top = max(slicei)
-	covered = sum(!slice[1:top])
-	}
-  covered
-}
-
-getnumcoveredcells = function(run,ts){
-  print(ts)
-  load( file = paste("worlds",ts,run))
-  world2 = world > 0 | dead > 0
-  allcovered = apply(world2,c(1,2),countcoveredpixels )
-  sum(allcovered)
-}
-####################
-
-cc=sapply(1:50,function(ts) getnumcoveredcells(1,ts))
-plot(cc)
-
 #################################################
 
-############
-
 ### covered cells from sides
-
-par(mfrow=c(2,3))
-image(world2[,,1])
-allcovered = apply(world2,c(1,2),countcoveredpixels )
-image(allcovered)
-az=which(world2[,,1],arr.ind=T)
-#points(az[,1]/100,az[,2]/100,pch=16,cex=0.1)
-allcovered = apply(world2,c(1,3),countcoveredpixels )
-image(allcovered)
-allcovered = apply(world2,c(1,3),countcoveredpixels2 )
-image(allcovered)
-allcovered = apply(world2,c(2,3),countcoveredpixels )
-image(allcovered)
-allcovered = apply(world2,c(2,3),countcoveredpixels2 )
-image(allcovered)
-
 
 countcoveredpixels2 = function(slice){
   covered = 0
   if (any(slice)) {
-	slicei = which(rev(slice))
-	top = max(slicei)
-	covered = sum(!rev(slice)[1:top])
-	}
+    slicei = which(rev(slice))
+    top = max(slicei)
+    covered = sum(!rev(slice)[1:top])
+  }
   covered
 }
 
+
+### Heat maps for side view ----
+par(mfrow=c(2,3))
+image(world2[,,1], main="covered @ lvl 1")
+allcovered = apply(world2,c(1,2),countcoveredpixels )
+image(allcovered, main="sheltered pixels")
+az=which(world2[,,1],arr.ind=T)
+#points(az[,1]/100,az[,2]/100,pch=16,cex=0.1)
+allcovered = apply(world2,c(1,3),countcoveredpixels )
+image(allcovered, main = "sideview N-S")
+allcovered = apply(world2,c(1,3),countcoveredpixels2 )
+image(allcovered, main = "sideview S-N")
+allcovered = apply(world2,c(2,3),countcoveredpixels )
+image(allcovered, main = "sideview E-W")
+allcovered = apply(world2,c(2,3),countcoveredpixels2 )
+image(allcovered, main = "sideview W-E")
+
 getnumcoveredcellssides = function(run,ts){
   print(ts)
-  load( file = paste("worlds",ts,run))
   world2 = world > 0 | dead > 0
   allcovered = apply(world2,c(2,3),countcoveredpixels2 )
   c1 = sum(allcovered)
@@ -103,28 +141,12 @@ getnumcoveredcellssides = function(run,ts){
   c4 = sum(allcovered)
   (c1+c2+c3+c4)/4
 }
-
-getnumcoveredcellssides(1,52)/ws/ws
-getnumcoveredcellssides(1,104)/ws/ws
-getnumcoveredcellssides(1,52*4)/ws/ws
 ######################################################
 
-## height-volume profile/ top-heaviness?
-
-load( file = paste("worlds",ts,run))
-world2 = world > 0 | dead > 0
-volbylayer = apply(world2,3,sum)
-plot(volbylayer,1:ws,t='l',ylim=c(0,30),ylab="height",xlab="volume")
-load( file = paste("worlds",52,run))
-world2 = world > 0 | dead > 0
-volbylayer = apply(world2,3,sum)
-lines(volbylayer,1:ws,col='red')
-
-###########################################
 
 #Visibility - top view
 
-visibility2 = array(0,c(ws,ws,ws))
+     = array(0,c(ws,ws,ws))
 
 visibility = array(0,c(ws,ws,ws))
 visibility[,,ws]=1
@@ -178,7 +200,7 @@ visibility2 = visibility2 + visibility
 visibility2 = visibility2 /5
 
 ###################################################
-sw=0.7
+sw=0.5
 visibility = array(0,c(ws,ws,ws))
 visibility[,,ws]=1
 for (layer in ws:2){
@@ -234,43 +256,5 @@ plot(shh,t='l')
 shh2=apply(sheltered2,3,mean)
 lines(shh,col='red')
 
-############################################################
-## pixel to pixel
-############################################################
-
-isLoS = function(a,b){
-	ans = F
-	leng = sqrt(sum((a-b)^2))
-	npts = round(leng*10)
-	ptmat = cbind(seq(a[1],b[1],length.out=npts) , seq(a[2],b[2],length.out=npts), seq(a[3],b[3],length.out=npts) )
-	ptmat = round(ptmat)
-	if (!any(world2[ptmat])) ans = T
-	ans
-}
-
-### test from ocean floor to mid point of top
-
-resmat = matrix(NA, nrow=ws,ncol=ws)
-for (i in 1:ws) for (j in 1:ws){
-	resmat[i,j] = isLoS(c(i,j,1) , c(50,50,100))	
-}
-image(resmat)
-
-### test from ocean floor to all of top
-
-resmat = array(NA, c(ws,ws,ws*ws))
-iii=0
-for (ii in seq(1,ws,by=10)) for (jj in seq(1,ws,by=10)){
-iii=iii+1
-print(iii)
-for (i in 1:ws) for (j in 1:ws){
-	resmat[i,j,iii] = isLoS(c(i,j,1) , c(ii,jj,100))	
-}
-}
-dim(resmat)
-resmat2 = apply(resmat[,,1:100],c(1,2),mean)
-dim(resmat2)
-image(resmat2)
-
-
-
+mean(sheltered[,,1])  ## percnt of shelter at the bottom
+mean(sheltered) ## proportion of all cells sheltered

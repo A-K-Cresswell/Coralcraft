@@ -4,7 +4,6 @@
 # Authors
 # Michael Renton
 # Anna K Cresswell
-# Daphne Oh
 
 # For inquires contact annacresswell@gmail.com
 
@@ -13,16 +12,14 @@
 # Online Resource 3 of Cresswell et al. 2020, "Frequent hydrodynamic disturbances decrease the morphological diversity and structural complexity of simulated coral communities" published in Coral Reefs
 
 # Set your working directory to a folder containing this script and Online_Resource_1_Coral_morphology_design.R
-setwd("~/GitHub/Coralcraft") # Daph's working directory
-#setwd("~/GitHub/Coralcraft") # Anna's working directory
-
+work.dir=setwd("~/GitHub/Coralcraft")
 colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
            "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange")
 colpal2= c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
            "darkolivegreen1", "aquamarine3", "skyblue3", "orchid1","orange","grey")
 
 # for export naming ----
-version = paste(Sys.Date())
+version = paste(format(Sys.Date(), "%Y%m%d"))
 
 # libaries 
 library(rgl)
@@ -31,19 +28,19 @@ library(scatterplot3d)
 # 1. set parameters ----
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
-timesteps = 52*3  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
+timesteps = 52*10  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
 mindepth = 0 #(m) # used to calc top of world light level
-n.initial.colonies = 10  # how many corals in the beginning - initial size is one block each (i.e. 1cm x 1cm)
+n.initial.colonies = 1  # how many corals in the beginning - initial size is one block each (i.e. 1cm x 1cm)
 
 # set spawning parameters ----
-randomrecruits = 1 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
-spawn.freq = 1 # 52 is annually --- how frequently (in timesteps) does spawning occur (set to high number for no spawning)
-nnewrecruits= 5 # how many new corals each spawn (could make random)
+randomrecruits = 0 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
+spawn.freq = 99999 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
+nnewrecruits= 0 # how many new corals each spawn (could make random)
 
 # set disturbance parameters ----
-randomdist = "fixed" # fixed or random disturbance intensity and frequency?
+randomdist = "random" # fixed or random disturbance intensity and frequency?
 # intensity 
 if(randomdist == "fixed") disturbance.intensity.low = c(20,20,20) else disturbance.intensity.low = exp(rnorm(1000,log(20),0.5)) # how intense is the disturbance (a smaller number is a bigger disturbance) 
 if(randomdist == "fixed") disturbance.intensity.high = c(1.5,1.5,1.5) else disturbance.intensity.high = exp(rnorm(1000,log(1.5),0.5)) # how intense is the disturbance (a smaller number is a bigger disturbance) 
@@ -54,8 +51,8 @@ freq.low = 99999 # 99999 OR frequent OR infrequent
 freq.high = 99999 # 99999 OR frequent OR infrequent
 
 # background mortality paramters ----
-background.mort = 0.001 # base probability 99% chance of surviving a year
-background.mort2 = 0.005 # lower probability, 95%, for encrusting due to being on the bottom
+background.mort = 0 # base probability 99% chance of surviving a year
+background.mort2 = 0 # lower probability, 95%, for encrusting due to being on the bottom
 
 # light and resources parameters ----
 maint = 0.1
@@ -75,20 +72,19 @@ start.res = 1 # resources each colony starts with
 #source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
 
-
 # make new folder with name giving parameters for automatically saving outputs ----
-dir.create(paste(version, randomdist, timesteps, "tss", runs, "runs", spawn.freq, "spawn.freq", nnewrecruits, "nnewrecruits", randomrecruits, "randomrecruits", freq.low, freq.high, "disturbance frequencies", background.mort, "background mort", sep = "_"))
-foldername = paste(version, randomdist, timesteps, "tss", runs, "runs", spawn.freq, "spawn.freq", nnewrecruits, "nnewrecruits", randomrecruits, "randomrecruits", freq.low, freq.high, "disturbance frequencies", background.mort, "background mort", sep = "_")
+setwd(paste(work.dir, "2_SimulationOutputs", "1_Outputs", "1_SingleColony", sep="/"))
+dir.create(paste(version, "2_flexihem", timesteps, "tss", sep = "_"))
+foldername = paste(version, "2_flexihem", timesteps, "tss", sep = "_")
 # note, sometimes the long name strings can cause issues, so remove information not needed if start getting errors here
 
 # set the working directory to be this new folder
-thisoutput = paste(getwd(), foldername, sep="/")
+thisoutput = paste(work.dir, "2_SimulationOutputs", "1_Outputs", "1_SingleColony", foldername, sep="/")
 setwd(thisoutput)
 
-
 # plotting parameters ----
-draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
-save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
+draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
+save3D = 1 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
 drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
 r3dDefaults$windowRect = c(50,50,500,500) # increase size of rgl window for better resolution when saving
 #       # To save with new orientation of rgl window:
@@ -132,9 +128,11 @@ for (run in 1:runs){ # multiple simulation runs
   world = array(0,dim=c(ws,ws,ws)) # Create world as cube
   dead = array(0,dim=c(ws,ws,ws)) # Create dead world as cube
   light = array(rep(light.level * light.atten^((ws-1):0), each=ws*ws), dim=c(ws,ws,ws)) # this instantly sets up initial light through the world 
-  init.locations = sample(1:(ws*ws), n.initial.colonies) # randomly select locations for the initial colonies
-  rows = (init.locations-1)%%ws + 1
-  cols = (init.locations-rows)/ws + 1
+  # #init.locations = sample(1:(ws*ws), n.initial.colonies) # randomly select locations for the initial colonies
+  # rows = (init.locations-1)%%ws + 1
+  # cols = (init.locations-rows)/ws + 1
+  rows = 50 #fixed location, place coral in center of world
+  cols = 50 #fixed location
   for (i in 1:n.initial.colonies) world[rows[i], cols[i], 1] = i # assign colony id to location in world
   
   ftypessaveall = NULL # dataframe for saving the number of colonies, percentage cover, number of voxels, linear and surface rugosity in each timestep
@@ -145,8 +143,7 @@ for (run in 1:runs){ # multiple simulation runs
                                 "mushroom", "fingers", "sheet", "hedgehog", "staghorn"))  #new morphologies
   ftypes$ftnum = 1:nrow(ftypes)
   ftypes$resource.to.growth = 1 # this can be modified to change growth rates
-  ftsinc_list = c("encrusting", "flexi-hemispherical", "digitate", "corymbose", "thick tabular",
-                  "mushroom", "fingers", "sheet", "hedgehog", "staghorn") # select which functional types to include
+  ftsinc_list = c("flexi-hemispherical") # select which functional types to include
   
   ftsinc = subset(ftypes, names %in% ftsinc_list) # subset from the full possible list
   nftsinc = nrow(ftsinc)
@@ -225,7 +222,6 @@ for (run in 1:runs){ # multiple simulation runs
       }
       
       colonymap = subset(colonymap, stillalive) 	# drop the fully dead colonies out of the colony map 
-      # in future versions may want to return these as 'dead structure' for some timesteps
       
       ### Growth ----
       ncolonies = nrow(colonymap)
@@ -524,7 +520,7 @@ for (run in 1:runs){ # multiple simulation runs
     shade3d(qmesh3d(verticesside, indices),color='grey')
     text3d(-6,-6,0,paste('Time step', ts))
     if (save3D == 1) {
-      rgl.snapshot(paste(version, ts, "final.png"))
+      rgl.snapshot(paste(ts, ".png"))
     }
     rgl.close()
   }
@@ -538,7 +534,7 @@ for (run in 1:runs){ # multiple simulation runs
       colonymap$ft[colonymap$colonyid == thisid]
     }))
     ftss[ifdead==1] = 16
-    png(paste(timesteps + 1000, ".png"), width = 20, height = 20, units = "cm", res = 200) #change ts to timesteps to save ONLY final plot   
+    png(paste(ts + 1000, ".png"), width = 20, height = 20, units = "cm", res = 200) #change ts to timesteps to save ONLY final plot   
     scatterplot3d(
       loc[,1], loc[,2], loc[,3],
       color=colpal2[ftss], ##[coralpolyps$ft],
@@ -560,13 +556,13 @@ matplot(t(coversummary/100),t='l',xlab = "timestep", ylab  ="cover")
 legend('topleft',c(as.character(ftypes$names),'dead'),col=1:6,lty=1:6, cex = 0.3)
  print(colonymap) 
  
- ### output colony structure for new metrics
- if (ts%%52==0) save(light,dead,world , file = paste("worlds",ts,run))
-
+ ### output colony structure
+if (ts%%52==0) save(light,dead,world , file = paste("worlds",ts,run))
+ 
   
 }# End of simulation loop
 
 # Save scores of cells, cover and no. colonies
- write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
+write.csv(ftypessaveall, paste("run", run, ".csv", sep = ""), row.names =F)
 paste("ftypessaveall exported")
 } # End of multiple runs loop

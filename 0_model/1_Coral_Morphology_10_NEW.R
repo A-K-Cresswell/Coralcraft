@@ -8,7 +8,7 @@
 # Appendix B of Cresswell et al. 2019, "Modelling the effects of hydrodynamic disturbance intensity and frequency on the morphological diversity and structural complexity of coral communities"
 
 library(rgl)
-setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft") #for daph
+setwd("~/GitHub/Coralcraft") #for daph
 
 # This script is a source file. It introduces all possible functional forms, and, based on the functional type, specifies the possible cells the functional type may grow into, as referenced to a starting cell.
 
@@ -126,15 +126,25 @@ dim(thiscelllist)
 
 ### 8. sheet-cone
 thiscelllist = NULL
-gapsize = 6
+gapsize = 8
+ok = allcells$x==0 & allcells$y==0 & allcells$z==0
 for (ddd in seq(0,24,by=gapsize )) {
-  ok = with(allcells,  (abs(dist2-z-ddd)<=1.5 & z<(ddd+6) & z>1) | (z==1 & dist2<ddd & dist2>(ddd-gapsize))  ) 
-  thiscelllistnew = subset(allcells, ok )
-  thiscelllistnew$pr = (ddd + thiscelllistnew$dist2)/2
-  thiscelllist = rbind(thiscelllist , thiscelllistnew)
+  ok2 = with(allcells,  (abs(dist2-z-ddd)<=1 & z<(ddd+6) & z>1) | (z==1 & dist2<=ddd & dist2>(ddd-gapsize))  ) 
+  ok = ok | ok2
 }
+thiscelllist = subset(allcells, ok )
+thiscelllist = subset(thiscelllist , x > (-50) & y > (-50))
+thiscelllist$pr = (thiscelllist$dist2)
 ftcelllist[[8]] = thiscelllist[-c(4:5)]
 dim(thiscelllist)
+
+head(thiscelllist )
+  m1 = array(0,dim=c(ws,ws))
+  aslice= (subset(thiscelllist,x==0))
+  inds = as.matrix(aslice[,2:3])
+  inds[,1] = inds[,1] + ws/2
+  m1[inds] = 999-aslice$pr
+image(log(m1))
 
 # ### 8.1 sheet-cone with right shape but with errors
 # thiscelllist = NULL
@@ -199,9 +209,19 @@ for (i in 1:length(ftcelllist)){
 # tcl = ftcelllist[[i]]
 # min(tcl[tcl>0])
 # max(tcl)
-# inds = which(tcl>980,arr.ind=TRUE) 
+# inds = which(tcl>0,arr.ind=TRUE) 
 # open3d()
 # spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])
+
+#par(mfrow=c(2,2))
+#for (i in 7:10){
+#tcl = ftcelllist[[i]]
+#plot(tcl[tcl>0],ylim=c(940,1000))
+#image(log(tcl[50,,]))
+#}
+tcl = ftcelllist[[8]]
+#plot(tcl[tcl>0],ylim=c(940,1000))
+image(log(tcl[49,,]))
 
 # 
 # tcl = ftcelllist[[5]]
@@ -213,18 +233,19 @@ for (i in 1:length(ftcelllist)){
 # # set the working directory to save individual coral growth forms
 # setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft/Coral Morphologies")
 # 
-#Plot each for in rgl at set radius (you will need to load the rgl package to do this)
- colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
-            "darkolivegreen1", "aquamarine3", "cadetblue1", "orchid1","orange")
+# Plot each for in rgl at set radius (you will need to load the rgl package to do this)
+colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
+           "darkolivegreen1", "aquamarine3", "cadetblue1", "orchid1","orange")
 
 for (i in (1:10)) {
-  tcl = ftcelllist[[i]] # choose one to plot
-  max(tcl)
-  inds = which(tcl>920,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
-  inds
-  open3d()
-  spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])#,alpha=0.9,coralpolyps$sz*0.7)
-  #rgl.snapshot(paste(i,".png"))
+ tcl = ftcelllist[[i]] # choose one to plot
+ max(tcl)
+ inds = which(tcl>920,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
+ inds
+ open3d()
+ spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])#,alpha=0.9,coralpolyps$sz*0.7)
+ #rgl.snapshot(paste(i,".png"))
 }
 
 save(ftcelllist,file="ftcelllist")
+

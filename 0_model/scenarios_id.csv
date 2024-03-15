@@ -1,0 +1,27 @@
+﻿id,scenario,names,labels,code
+1,all.10,MD,MaxDiv,MD
+2,bot.5,SD-Simple,Simple,Simple
+3,top.5,SD-Complex,Complex,Complex
+4,enc,Enc,Encrusting,Encrusting
+5,fle,Hem,Hemispherical,Hemispherical
+6,dig,Dig,Digitate,Digitate
+7,cor,Cor,Corymbose,Corymbose
+8,tab,Tab,Tabular,Tabular
+9,mus,Mus,Mushroom,Mushroom
+10,fin,Col,Columnar,Columnar
+11,con,Fol,Cone,Cone
+12,hed,Bus,Bushy,Bushy
+13,bra,Bra,Branching,Branching
+14,ex.bra,Excl. Bra,No Branching,No Branching
+15,ex.hed,Excl. Hed,No Bushy,No Bushy
+16,ex.con,Excl. Con,No Cone,No Cone
+17,ex.fin,Excl. Fin,No Columnar,No Columnar
+18,ex.mus,Excl. Mus,No Mushroom,No Mushroom
+19,ex.tab,Excl. Tab,No Tabular,No Tabular
+20,ex.cor,Excl. Cor,No Corymbose,No Corymbose
+21,ex.dig,Excl. Dig,No Digitate,No Digitate
+22,ex.fle,Excl. Fle,No Hemispherical,No Hemispherical
+23,ex.enc,Excl. Enc,No Encrusting,No Encrusting
+24,ins,Inshore,Inshore,Inshore
+25,fla,Reef Flat,Reef Flat,Reef Flat
+26,slo,Reef Slope,Reef Slope,Reef Slope
