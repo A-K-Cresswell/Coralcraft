@@ -24,7 +24,7 @@ library(scatterplot3d)
 
 # 1. set parameters ----
 # set simulation parameters ----
-runs = 1 # how many times to run the simulation
+runs = 100 # how many times to run the simulation
 timesteps = 52*5  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
@@ -66,7 +66,7 @@ start.res = 1 # resources each colony starts with
 #Light_depth = Light_surface x e^(-k*depth)
 
 # 2. source growth form information ----
-#source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
+source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
 scens.id=read.csv("scenarios_id.csv")
 scens.csv=read.csv("scenarios.csv", header=T)
@@ -164,19 +164,6 @@ for (run in 1:runs){ # multiple simulation runs
     # ft =  ((1:n.initial.colonies)-1)%%ftsinc + 1,
     ft = rep(ftsinc$ftnum, length.out = n.initial.colonies), # ORDERED SAMPLE
     # ft =  sample(c(ftsinc$ftnum,ftsinc$ftnum), n.initial.colonies, replace = T), # RANDOM SAMPLE
-    
-    #   ## ALLOCATED SAMPLE
-    #   ft = c(rep(ftsinc$ftnum[1], 2), #encrusting 
-    #          rep(ftsinc$ftnum[2], 3), #flexihem
-    #          rep(ftsinc$ftnum[3], 0), #digitate
-    #          rep(ftsinc$ftnum[4], 1), #corymbose
-    #          rep(ftsinc$ftnum[5], 2), #tabular
-    #          rep(ftsinc$ftnum[6], 2), #mushroom
-    #          rep(ftsinc$ftnum[7], 1), #fingers
-    #          rep(ftsinc$ftnum[8], 1), #cone
-    #          rep(ftsinc$ftnum[9], 6), #hedgehog
-    #          rep(ftsinc$ftnum[10], 2)), #staghorn
-    # 
     age = 1,
     res = start.res)
   
@@ -288,10 +275,7 @@ for (run in 1:runs){ # multiple simulation runs
             newcells = 	neighbs[use,]
             world[matrix(newcells,ncol=3)] = thisid 
           }}}
-      
-      
-      
-      
+
       # update age of all colonies
       colonymap$age = colonymap$age + 1 # all colonies age each timestep, even if they didn't grow 
     } # end if statement for if there are no colonies in colonymap

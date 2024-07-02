@@ -33,7 +33,7 @@ library(raster)
 library(ggpubr)
 library(tidyverse)
 
-hd = paste("D:/Coralcraft") #to read in data from hard drive
+hd = paste("D:/Coralcraft") #to read in world files from hard drive
 work.dir = paste("~/1_Writing/1_Chapter 1_Coralcraft/00_model")
 sim.wd = paste(hd,"1_Simulations", "1_Outputs", "2_Scenarios", sep="/")
 met.wd = paste(work.dir,"2_Metrics", sep="/")
