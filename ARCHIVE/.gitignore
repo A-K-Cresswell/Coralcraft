@@ -1,0 +1,9 @@
+*.xlsx
+*.Rdata
+*.Rda
+*.png
+*.pdf
+*.nc
+*.gif
+.Rhistory
+
