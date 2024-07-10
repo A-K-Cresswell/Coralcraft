@@ -1,100 +1,56 @@
-#### Rugosity
+# Code to calculate metrics from simulation output ("world files")
 
-## linear rugosity 
-## surface rugosity 
-
-# this includes metric code and reading world files
-###############################################################################################
+#################################
+version = paste(Sys.Date())
 timesteps = 52*5
 runs = 100
-ws=100
 
-library(animation)
-library(scatterplot3d)
-library(rgl)
-library(magick)
-library(dplyr)
-library(ggplot2)
-library(gridExtra)
-library(cowplot)
-library(png)
-library(raster)
-library(ggpubr)
+work.dir = paste("~") #set main work directory (i.e. 0_model)
+sim.wd = paste(work.dir,"1_simulations", sep="/") #set simulation wd
+sim.output = paste(sim.wd,"3_output", sep="/") #directory to world files
+met.wd = paste(work.dir,"2_metrics", sep="/") #set metrics wd
+met.script = paste(met.wd,"1_scripts", sep="/") #metrics script
+met.output = paste(met.wd, "2_output", sep="/") #metrics output
 
-# Set your working directory
-hd = paste("D:/GitHub/Coralcraft") #to read in data from hard drive
-work.dir = paste(getwd())
-sim.wd = paste(hd,"1_Simulations", "1_Outputs", "2_Scenarios", sep="/")
-met.wd = paste(work.dir,"2_Metrics", sep="/")
-script = paste(met.wd,"1_MetricsScripts", sep="/") 
-output = paste(met.wd, "1_Outputs", sep="/") 
-###############################################################################################
+setwd(met.script) 
+source("metrics_code.R")
+#####################################################################################################
+#### read in scenario files ####
 setwd(work.dir)
 scens.id=read.csv("scenarios_id.csv")
 scens.csv=read.csv("scenarios.csv", header=T)
 fts=read.csv("growth forms.csv")
-###############################################################################################
-
-## METRICS CODE ##
-
-#### linear rugosity ----
-lin_rugosity = function(run, ts){
-  load(file = paste(id, scens, "worlds", ts, run, sep="_"))
-
-  world2 = apply(world,c(1,2),function (x) max(which(x>0)))
-  world2[world2 == -Inf] = 0
-  sum(abs(diff(world2[,ws/2])))+ws 
-}
-
-#### surface rugosity metric code ----
-sur_rugosity = function(run, ts){
-  load(file = paste(id, scens, "worlds", ts, run, sep="_"))
-  
-  currentcells = which(world!=0,arr.ind=TRUE)
-  up = down = left = right = back = front = currentcells 
-  down[,3]=down[,3]-1  
-  up[,3]=up[,3]+1
-  left[,2]=left[,2]-1
-  right[,2]=right[,2]+1
-  back[,1]=back[,1]+1
-  front[,1]=front[,1]-1	
-  down=down[down[,3]>0,]
-  up=up[up[,3]<=ws,]
-  left[,2][left[,2]==0]=ws
-  right[,2][right[,2]>ws]=1
-  front[,1][front[,1]==0]=ws
-  back[,1][back[,1]>ws]=1
-  potneighbs = rbind(up,down,left,right,back,front)
-  ifempty = world[potneighbs]==0 
-  totalSA=sum(ifempty)
-  
-  emptyz1 = sum(world[,,1]==0)
-  totalSA + emptyz1 
-  
-}
 ###################################################################################################
 
-### Load Individual Scenarios ####
+### I WONDER IF I SHOULD LIST OUT ALL SCENARIOS AND SHOW THAT I HAD COMBINED ALL DF USING RBIND??
 
+### DIVERSITY COMMUNITY TYPES 
 # 1_ALL 10  ----
 sc.lab = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
 name = sc.lab$names
-foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE HERE
+foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE HERE ACCORDING TO SIM.OUTPUT
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
 
 result_list <- NULL # make empty data frame
-for (run in seq(1,100)){
+for (run in seq(1,runs)){
   
   for (ts in c(1, seq(13, timesteps, by = 13))) {
     df <- data.frame(run = run,
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run,ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts)
+                     )
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -118,8 +74,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug =lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -143,8 +105,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run,ts), 
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -154,7 +122,7 @@ df_3_top.5 = result_list
 
 #####################################################################################################
 
-### 1 functional type only (20 colonies of 1 fts) [run #9-13 then bind with other file]
+### MONOSPECIFIC COMMUNITY TYPES
 # 4_enc  ----
 sc.lab = as.vector(subset(scens.id, scenario %in% c("enc"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
@@ -172,8 +140,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -197,8 +171,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -222,8 +202,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -247,8 +233,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -272,8 +264,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -297,14 +295,20 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
 df_9_mus = result_list
-
+ 
 # 10_fin  ----
 sc.lab = as.vector(subset(scens.id, scenario %in% c("fin"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
@@ -322,8 +326,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -347,8 +357,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -372,8 +388,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -397,8 +419,14 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     lin_rug = lin_rugosity(run, ts),
-                     sur_rug = sur_rugosity(run, ts))
+                     # numcoveredcells= getnumcoveredcells(run, ts),
+                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
+                     # meantop = meantopview(run,ts),
+                     # meantop_1 = meantopview_1(run,ts),
+                     # meantop_5 = meantopview_5(run,ts),
+                     # meantop_10 = meantopview_10(run,ts),
+                     meantop_1_15 = meantopview_1_15(run,ts),
+                     meantop_1_20 = meantopview_1_20(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -412,7 +440,9 @@ df_metrics = rbind(df_4_enc, df_5_fle, df_6_dig, df_7_cor, df_8_tab,
                    df_9_mus, df_10_fin, df_11_con, df_12_hed, df_13_bra) #1 ft only
 
 # saving outputs
-setwd(output)
-write.csv(df_metrics, file = "2_df_rugosity.csv", row.names = F)
-################################################################
+setwd(met.output)
+write.csv(df_metrics, file = "df_metrics.csv", row.names = F)
+
+
+
 
