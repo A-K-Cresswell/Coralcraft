@@ -8,16 +8,15 @@ Cresswell, A. K., Thomson, D. P., Haywood, M. D., & Renton, M. (2020). Frequent 
 
 It has since been further developed by Daphne Oh, Cresswell, A. K., Thomson, D. P. & Renton, M. to investigate structural complexity and shelter provision in different coral communities with a study relating to this currently under peer review. The code presented here reflects this most recent investigation as at July 2024 and allows simulation of communities composed of up to 10 different coral morpholohies (encrusting, hemispherical, digitate, corymbose, tabular, mushroom, columnar, foliose, bushy and branching) alongside the calculation of a range of different community metrics: coral colony density (per m2), percentage cover, colony volume (cm3), community diversity, linear rugosity, surface rugosity, fractal dimension, shelter volume, shelter from demersal and pelagic predators, and four variations of predator/prey size-dependent shelter. 
 
-# 0_model/1_Coral_Morphology_10_NEW.R
+# 0_model/1_simulations/2_scenarios/1_Coral_Morphology_10_NEW.R
 This gives the morphological specifications of each of the 10 coral morphologies that may be included in simulations
 
-# 0_model/1_Coralcraft_simulation_code.R
+# 0_model/1_simulations/2_scenarios/1_Coralcraft_simulation_code.R
 This is the main code for the model simulation....
 
-# 0_model/scenarios.csv
+# 0_model/1_simulations/2_scenarios/scenarios.csv
 This .csv file is used to determine morphological composition of coral communities... 
 
-# 0_model/scenarios_id.csv 
+# 0_model/1_simulations/2_scenarios/scenarios_id.csv 
 This .csv file is used to label each coral community/scenario. This is needed to run simulations of the coral community type of interest and to calculate metrics. 
 
-# 0_model/2_metrics
