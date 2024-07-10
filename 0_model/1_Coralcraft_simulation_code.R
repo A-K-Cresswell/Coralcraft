@@ -7,11 +7,10 @@
 # Daphne Oh
 
 # Set your working directory
-hd = paste("E:/GitHub/Coralcraft") #to read in data from hard drive
-work.dir = paste("~/1_Writing/1_Chapter 1_Coralcraft/00_model")
-sim.wd = paste(hd,"1_Simulations", "1_Outputs", "2_Scenarios", sep="/")
-met.wd = paste(work.dir,"2_Metrics", sep="/")
-script = paste(met.wd,"1_MetricsScripts", sep="/") 
+work.dir = paste("___") #set work directory
+sim.wd = paste(work.dir, "0_simulation". sep="/") #for model simulation wd
+met.wd = paste(work.dir,"2_Metrics", sep="/") #for metric calculation wd
+script = paste(met.wd,"1_Scripts", sep="/") 
 output = paste(met.wd, "1_Outputs", sep="/") 
 setwd(work.dir)
 
@@ -68,14 +67,14 @@ start.res = 1 # resources each colony starts with
 # 2. source growth form information ----
 source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
-scens.id=read.csv("scenarios_id.csv")
-scens.csv=read.csv("scenarios.csv", header=T)
-fts=read.csv("growth forms.csv")
+scens.id=read.csv("scenarios_id.csv") #load scenarios
+scens.csv=read.csv("scenarios.csv", header=T) #load morphological composition of scenarios
+fts=read.csv("growth forms.csv") ## DAPH TO INVESTIGATE IF NEEDED
 
 # select scenario
-sc.lab = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##change scenarios here
-id = sc.lab$id
-scens = sc.lab$scenario
+sc.label = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##change scenarios here
+id = sc.label$id
+scens = sc.label$scenario
 
 # to select growth forms from scenarios
 sel.fts <- scens.csv[scens] 
@@ -83,14 +82,14 @@ sel.fts <- as.numeric(na.omit(as.vector(unlist(sel.fts))))
 labels = as.vector(subset(fts, id %in% sel.fts))
 
 # make new folder with name giving parameters for automatically saving outputs ----
-# setwd(sim.wd)
-# dir.create(paste(id, scens, timesteps, "tss", runs, "runs", version, sep = "_")) 
-# foldername = paste(id, scens, timesteps, "tss", runs, "runs", version, sep = "_")
-# note, sometimes the long name strings can cause issues, so remove information not needed if start getting errors here
+setwd(sim.wd)
+dir.create(paste(id, scens, timesteps, "tss", runs, "runs", version, sep = "_")) 
+foldername = paste(id, scens, timesteps, "tss", runs, "runs", version, sep = "_")
+#note, sometimes the long name strings can cause issues, so remove information not needed if start getting errors here
 
 # set the working directory to be this new folder
-# thisoutput = paste(sim.wd, foldername, sep="/")
-# setwd(thisoutput)
+thisoutput = paste(sim.wd, foldername, sep="/")
+setwd(thisoutput)
 
 # plotting parameters ----
 draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
