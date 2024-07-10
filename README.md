@@ -13,3 +13,11 @@ This gives the morphological specifications of each of the 10 coral morphologies
 
 # 0_model/1_Coralcraft_simulation_code.R
 This is the main code for the model simulation....
+
+#0_model/scenarios.csv
+This .csv file is used to determine morphological composition of coral communities... 
+
+#0_model/scenarios_id.csv 
+This .csv file is used to label each coral community/scenario. This is needed to run simulations of the coral community type of interest and to calculate metrics. 
+
+#0_model/2_metrics
