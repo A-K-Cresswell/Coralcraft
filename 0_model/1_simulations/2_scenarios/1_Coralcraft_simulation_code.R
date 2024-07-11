@@ -1,5 +1,6 @@
 # Coralcraft - A functional-structural coral model
 # Model code
+# this code works with R Studio v4.0
 
 # Authors
 # Michael Renton
