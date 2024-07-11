@@ -564,8 +564,8 @@ matplot(t(coversummary/100),t='l',xlab = "timestep", ylab  ="cover")
 legend('topleft',c(as.character(ftypes$names),'dead'),col=1:6,lty=1:6, cex = 0.3)
  print(colonymap) 
  
- ### output colony structure
-if (ts == 1) save(light,dead,world , file = paste(id, scens, "worlds",ts,run, sep = "_")) #saves world f
+ ### output colony structure - saving 100x100 environment for further analysis
+if (ts == 1) save(light,dead,world , file = paste(id, scens, "worlds",ts,run, sep = "_")) #saves world files
 if (ts%%13==0) save(light,dead,world , file = paste(id, scens, "worlds",ts,run, sep = "_")) #
  
   
