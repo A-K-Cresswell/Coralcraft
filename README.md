@@ -8,5 +8,5 @@ Cresswell, A. K., Thomson, D. P., Haywood, M. D., & Renton, M. (2020). Frequent 
 
 It has since been further developed by Daphne Oh, Cresswell, A. K., Thomson, D. P. & Renton, M. to investigate structural complexity and shelter provision in different coral communities with a study relating to this currently under peer review. The code presented here reflects this most recent investigation as at July 2024 and allows simulation of communities composed of up to 10 different coral morpholohies (encrusting, hemispherical, digitate, corymbose, tabular, mushroom, columnar, foliose, bushy and branching) alongside the calculation of a range of different community metrics: coral colony density (per m2), percentage cover, colony volume (cm3), community diversity, linear rugosity, surface rugosity, fractal dimension, shelter volume, shelter from demersal and pelagic predators, and four variations of predator/prey size-dependent shelter. 
 
-
+Refer to 0_model and further README.md information.
 
