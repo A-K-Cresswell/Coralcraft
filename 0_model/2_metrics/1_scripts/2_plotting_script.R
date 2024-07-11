@@ -13,6 +13,15 @@ met.script = paste(met.wd,"1_scripts", sep="/") #metrics script
 met.output = paste(met.wd, "2_output", sep="/") #metrics output
 plots = paste(work.dir, "3_plots", sep="/")
 
+#load libraries
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+library(png)
+library(raster)
+library(ggpubr)
+library(tidyverse)
+
 ## load csv files & plotting parameters
 setwd(met.script)
 source("plot_par.R")
