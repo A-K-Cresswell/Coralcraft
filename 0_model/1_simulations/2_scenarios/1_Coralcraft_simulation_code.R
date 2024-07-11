@@ -7,7 +7,7 @@
 # Daphne Oh
 
 # Set your working directory
-work.dir = paste("___") #set work directory
+work.dir = paste("./") #set work directory to location where script is 
 sim.wd = paste(work.dir, "1_simulations", sep="/") #for model simulation wd
 met.wd = paste(work.dir,"2_Metrics", sep="/") #for metric calculation wd
 script = paste(met.wd,"1_Scripts", sep="/") 
