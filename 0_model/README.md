@@ -2,4 +2,4 @@
 For model simulations and saving of model output
 
 # 2_metrics 
-For metrics calculations and can only be conducted after running simulations
+For metrics calculations which can only be conducted after running simulations
