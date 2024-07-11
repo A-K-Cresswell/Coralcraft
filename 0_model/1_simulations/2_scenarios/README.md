@@ -9,3 +9,7 @@ This .csv file is used to determine morphological composition of coral communiti
 
 # scenarios_id.csv 
 This .csv file is used to label each coral community/scenario. This is needed to run simulations of the coral community type of interest and to calculate metrics. 
+
+# growth forms.csv
+coral growth forms
+
