@@ -1,5 +1,7 @@
 # Code to calculate metrics from simulation output ("world files")
 
+# this script was used to analyse output files from structural complexity and shelter investigation (Oh et al. 2024)
+
 #################################
 version = paste(Sys.Date())
 timesteps = 52*5
@@ -13,7 +15,7 @@ met.script = paste(met.wd,"1_scripts", sep="/") #metrics script
 met.output = paste(met.wd, "2_output", sep="/") #metrics output
 
 setwd(met.script) 
-source("metrics_code.R")
+source(paste0(met.script, "/metrics_code.R")) #try staying in same WD and putting path in call to open thingo
 #####################################################################################################
 #### read in scenario files ####
 setwd(work.dir)
