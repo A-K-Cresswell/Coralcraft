@@ -4,11 +4,10 @@
 # Authors
 # Michael Renton
 # Anna K Cresswell
-
-# Appendix B of Cresswell et al. 2019, "Modelling the effects of hydrodynamic disturbance intensity and frequency on the morphological diversity and structural complexity of coral communities"
+# Daphne Oh
 
 library(rgl)
-setwd("~/GitHub/Coralcraft") #for daph
+setwd("~/GitHub/Coralcraft") #set work directory here
 
 # This script is a source file. It introduces all possible functional forms, and, based on the functional type, specifies the possible cells the functional type may grow into, as referenced to a starting cell.
 
@@ -29,7 +28,7 @@ thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[1]] = thiscelllist[-c(4:5)] 
 dim(thiscelllist)
 
-### 2. flexi - hemisphere
+### 2. flexi - hemispherical
 r=1.5
 thiscelllist = allcells 
 thiscelllist$pr = sqrt(thiscelllist$x^2 + thiscelllist$y^2 + r * thiscelllist$z^2)
@@ -75,19 +74,19 @@ hedgehogforlater = thiscelllist
 ftcelllist[[4]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist )
 
-### 5. new thicker tabular
+### 5. tabular
 thiscelllist = subset(allcells, (dist2 <= 3 & z<12) | (z==12 & dist2 <= 10 )  | z==13 | z==14 ) 
 thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[5]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist)
 
-### 6. new massive/mushroom
+### 6. mushroom
 thiscelllist = subset(allcells, (dist2 <= 10 & z<10) | (z>=10) )
 thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[6]] = thiscelllist[-c(4:5)]
 dim(thiscelllist)
 
-### 7. fingers
+### 7. columnar
 ok = allcells$dist2 < 1.6
 ang1 = 2*pi/5
 for (ang in seq(ang1 ,2*pi,by=ang1 )){
@@ -124,7 +123,7 @@ thiscelllist$pr = sqrt((thiscelllist$x)^2 + (thiscelllist$y)^2 + (thiscelllist$z
 ftcelllist[[7]] = thiscelllist[-c(4:5)]  
 dim(thiscelllist)
 
-### 8. sheet-cone
+### 8. foliose
 thiscelllist = NULL
 gapsize = 8
 ok = allcells$x==0 & allcells$y==0 & allcells$z==0
@@ -146,18 +145,7 @@ head(thiscelllist )
   m1[inds] = 999-aslice$pr
 image(log(m1))
 
-# ### 8.1 sheet-cone with right shape but with errors
-# thiscelllist = NULL
-# for (ddd in seq(0,30,by=6)) {
-#   thissheet = subset(allcells,  abs(dist2-z-ddd)<=1.5 & dist2<(1.5*ddd+10))
-#   thissheet$pr = ddd
-#   thiscelllist = rbind(thiscelllist,thissheet)
-# }
-# thiscelllist$pr = thiscelllist$z - 0.5*thiscelllist$dist2
-# ftcelllist[[8]] = thiscelllist[-c(4:5)] 
-#dim(thiscelllist)
-
-### 9. hedgehog on a stalk
+### 9. bushy
 thiscelllist = ftcelllist[[4]]
 thiscelllist$z=thiscelllist$z+6
 thiscelllist=subset(thiscelllist,z<=100)
@@ -171,7 +159,7 @@ thiscelllist$pr = with(thiscelllist,sqrt(x^2+y^2+z^2))
 ftcelllist[[9]] = thiscelllist  
 dim(thiscelllist)
 
-### 10. branching 3
+### 10. branching 
 ok = allcells$dist2 < 1.5
 ang = 0
 for (bp in seq(5,60,by=3)){
