@@ -1,6 +1,15 @@
-# read_output 
-data cleaning and prepping for plotting
+# metrics_code.R
+metrics calculation from Coralcraft
+
+# plot_par.R
+plotting parameters
+
+# read_output.R 
+cleans data to prep dataframe for plotting
 
 # 1_metrics_calculation.R
-code for calculating structural complexity and shelter metrics 
+extracting structural complexity and shelter metrics from each coral community type
+
+# 2_plotting_scripts.R
+plots metrics against coral cover
 
