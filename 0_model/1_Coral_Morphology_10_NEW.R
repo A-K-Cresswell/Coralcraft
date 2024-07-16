@@ -7,7 +7,6 @@
 # Daphne Oh
 
 library(rgl)
-setwd("~/GitHub/Coralcraft") #set work directory here
 
 # This script is a source file. It introduces all possible functional forms, and, based on the functional type, specifies the possible cells the functional type may grow into, as referenced to a starting cell.
 
@@ -137,14 +136,6 @@ thiscelllist$pr = (thiscelllist$dist2)
 ftcelllist[[8]] = thiscelllist[-c(4:5)]
 dim(thiscelllist)
 
-head(thiscelllist )
-  m1 = array(0,dim=c(ws,ws))
-  aslice= (subset(thiscelllist,x==0))
-  inds = as.matrix(aslice[,2:3])
-  inds[,1] = inds[,1] + ws/2
-  m1[inds] = 999-aslice$pr
-image(log(m1))
-
 ### 9. bushy
 thiscelllist = ftcelllist[[4]]
 thiscelllist$z=thiscelllist$z+6
@@ -176,7 +167,7 @@ for (bp in seq(5,60,by=3)){
 thiscelllist = subset(allcells, ok ) 
 thiscelllist$pr = thiscelllist$dist1
 ftcelllist[[10]] = thiscelllist[-c(4:5)]  
-dim(thiscelllist )
+dim(thiscelllist)
 
 ### trim to a maximum radius of 40
 for (i in 1:length(ftcelllist)){
@@ -206,10 +197,10 @@ for (i in 1:length(ftcelllist)){
 #tcl = ftcelllist[[i]]
 #plot(tcl[tcl>0],ylim=c(940,1000))
 #image(log(tcl[50,,]))
-#}
-tcl = ftcelllist[[8]]
-#plot(tcl[tcl>0],ylim=c(940,1000))
-image(log(tcl[49,,]))
+# #}
+# tcl = ftcelllist[[8]]
+# #plot(tcl[tcl>0],ylim=c(940,1000))
+# image(log(tcl[49,,]))
 
 # 
 # tcl = ftcelllist[[5]]
@@ -217,23 +208,6 @@ image(log(tcl[49,,]))
 # inds = which(tcl>1010,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
 # inds
 # spheres3d(inds [,1],inds [,2],inds [,3], col='red')#,alpha=0.9,coralpolyps$sz*0.7)
-
-# # set the working directory to save individual coral growth forms
-# setwd("C:/Users/OH012/OneDrive - CSIRO/Documents/GitHub/Coralcraft/Coral Morphologies")
-# 
-# Plot each for in rgl at set radius (you will need to load the rgl package to do this)
-colpal = c("tomato", "gold", "springgreen4", "dodgerblue", "blueviolet",
-           "darkolivegreen1", "aquamarine3", "cadetblue1", "orchid1","orange")
-
-for (i in (1:10)) {
- tcl = ftcelllist[[i]] # choose one to plot
- max(tcl)
- inds = which(tcl>920,arr.ind=TRUE) # if limit to >960, will have a radius of ~40
- inds
- open3d()
- spheres3d(inds [,1],inds [,2],inds [,3], col=colpal[i])#,alpha=0.9,coralpolyps$sz*0.7)
- #rgl.snapshot(paste(i,".png"))
-}
 
 save(ftcelllist,file="ftcelllist")
 
