@@ -4,6 +4,8 @@
 # LAST UPDATED: 10-07-2024
 # Authors: Michael Renton, Daphne Oh
 
+
+  ## coral cover
 ### STRUCTURAL COMPLEXITY METRICS
   ## linear rugosity 
   ## surface rugosity
@@ -17,6 +19,12 @@
   ## Pelagic shelter (height 10cm)
   ## Size-dependent shelter
 ############################################################
+
+#### coral cover ----
+coralcover = function(run,ts){
+  load(file = paste(id, scens, "worlds",ts,run, sep = "_"))
+  cc=mean(apply(world,1:2,function(s) any(s>0)))
+}
 
 #### linear rugosity ----
 lin_rugosity = function(run, ts){
@@ -447,7 +455,7 @@ pel_shelter_10 = function(run,ts){
   mean(sheltered2[,,10])
 }
 
-#### Size-dependent shelter 
+#### Size-dependent shelter ----
 size_dep = function(run, ts){
   load(file = paste(id, scens, "worlds",ts,run, sep = "_")) # to load world file
   

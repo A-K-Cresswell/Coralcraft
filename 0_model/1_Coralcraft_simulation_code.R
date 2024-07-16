@@ -8,11 +8,11 @@
 # Daphne Oh
 
 # Set your working directory
-work.dir = setwd() #set work directory to location where 0_model is 
+work.dir = setwd("./Coralcraft/0_model") #set work directory to location where 0_model is 
 sim.wd = paste(work.dir, "1_simulation_output", sep="/") #for model simulation output
 out.wd = paste(work.dir,"2_output_analysis", sep="/") #for output analysis
 script = paste(out.wd,"1_scripts", sep="/") 
-output = paste(out.wd, "1_outputs", sep="/") 
+output = paste(out.wd, "2_output", sep="/") 
 setwd(work.dir)
 
 # for export naming ----
@@ -70,10 +70,10 @@ source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growt
 load(file="ftcelllist") # load growth forms
 scens.id=read.csv("scenarios_id.csv") #load scenarios/community types
 scens.csv=read.csv("scenarios.csv", header=T) #load morphological composition of scenarios
-fts=read.csv("growth forms.csv") #load coral morphologies
+fts=read.csv("growth_forms.csv") #load coral morphologies
 
 # select scenario
-sc.label = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##change scenarios here
+sc.label = as.vector(subset(scens.id, scenario %in% c("max.div"))) ##change scenarios here
 id = sc.label$id
 scens = sc.label$scenario
 
@@ -148,8 +148,8 @@ for (run in 1:runs){ # multiple simulation runs
   
   # set up functional types information ----
   nfts = length(ftcelllist) # set number of functional groups (e.g. tabular, columnar, massive, encrusting)
-  ftypes = data.frame(names = c("encrusting", "flexihem", "digitate", "corymbose", "tabular",
-                                "mushroom", "fingers", "foliose", "hedgehog", "branching"))  #new morphologies
+  ftypes = data.frame(names = c("encrusting", "flexihemispherical", "digitate", "corymbose", "tabular",
+                                "mushroom", "columnar", "foliose", "bushy", "branching"))  #new morphologies
   ftypes$ftnum = 1:nrow(ftypes)
   ftypes$resource.to.growth = 1 # this can be modified to change growth rates
   ftsinc_list = labels$name # select which functional types to include

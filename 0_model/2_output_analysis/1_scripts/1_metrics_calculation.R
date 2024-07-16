@@ -7,32 +7,31 @@ version = paste(Sys.Date())
 timesteps = 52*5
 runs = 100
 
-work.dir = paste("~") #set main work directory (i.e. 0_model)
-sim.wd = paste(work.dir,"1_simulations", sep="/") #set simulation wd
-sim.output = paste(sim.wd,"3_output", sep="/") #directory to world files
-met.wd = paste(work.dir,"2_metrics", sep="/") #set metrics wd
-met.script = paste(met.wd,"1_scripts", sep="/") #metrics script
-met.output = paste(met.wd, "2_output", sep="/") #metrics output
+library(tidyverse)
 
-setwd(met.script) 
-source(paste0(met.script, "/metrics_code.R")) #try staying in same WD and putting path in call to open thingo
+## set work directory
+work.dir = setwd("./Coralcraft/0_model") #set work directory to location where 0_model is 
+sim.wd = paste(work.dir, "1_simulation_output", sep="/") #for model simulation output
+out.wd = paste(work.dir,"2_output_analysis", sep="/") #for output analysis
+script = paste(out.wd,"1_scripts", sep="/") 
+output = paste(out.wd, "2_output", sep="/") 
+setwd(work.dir)
+
 #####################################################################################################
 #### read in scenario files ####
-setwd(work.dir)
+source(paste0(script, "/metrics_code.R"))
 scens.id=read.csv("scenarios_id.csv")
 scens.csv=read.csv("scenarios.csv", header=T)
-fts=read.csv("growth forms.csv")
+fts=read.csv("growth_forms.csv")
 ###################################################################################################
 
-### I WONDER IF I SHOULD LIST OUT ALL SCENARIOS AND SHOW THAT I HAD COMBINED ALL DF USING RBIND??
-
 ### DIVERSITY COMMUNITY TYPES 
-# 1_ALL 10  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##CHANGE SCENARIO HERE
+# 1_max.div  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("max.div"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
-foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE HERE ACCORDING TO SIM.OUTPUT
+name = sc.lab$labels
+foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE ACCORDING TO OUTPUT FOLDER
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
 
@@ -44,6 +43,7 @@ for (run in seq(1,runs)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
+                     coral_cover = coralcover(run,ts),
                      linear_rugosity = lin_rugosity(run,ts),
                      surface_rugosity = sur_rugosity(run,ts),
                      fractal_dimension = fracdim(run,ts), 
@@ -57,13 +57,13 @@ for (run in seq(1,runs)){
   }
   print(run)
 }
-df_1_all.10 = result_list
+df_1_max.div = result_list
 
-# 2_bottom_5  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("bot.5"))) ##CHANGE SCENARIO HERE
+# 2_Simple  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("simple"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -76,25 +76,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
-df_2_bot.5 = result_list
+df_2_simple = result_list
 
-# 3_top_5  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("top.5"))) ##CHANGE SCENARIO HERE
+# 3_Complex  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("complex"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -107,29 +108,30 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
-df_3_top.5 = result_list
+df_3_complex = result_list
 
 
 #####################################################################################################
 
 ### MONOSPECIFIC COMMUNITY TYPES
-# 4_enc  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("enc"))) ##CHANGE SCENARIO HERE
+# 4_encrusting  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("encrusting"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -142,25 +144,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
 df_4_enc = result_list
 
-# 5_fle  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("fle"))) ##CHANGE SCENARIO HERE
+# 5_hemispherical  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("hemispherical"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -173,25 +176,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
-df_5_fle = result_list
+df_5_hem = result_list
 
-# 6_dig  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("dig"))) ##CHANGE SCENARIO HERE
+# 6_digitate  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("digitate"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-13", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -204,25 +208,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
 df_6_dig = result_list
 
-# 7_cor  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("cor"))) ##CHANGE SCENARIO HERE
+# 7_corymbose  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("corymbose"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-15", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -235,25 +240,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
 df_7_cor = result_list
 
-# 8_tab  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("tab"))) ##CHANGE SCENARIO HERE
+# 8_tabular  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("tabular"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-15", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -266,25 +272,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
 df_8_tab = result_list
 
-# 9_mus  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("mus"))) ##CHANGE SCENARIO HERE
+# 9_mushroom  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("mushroom"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-15", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -297,25 +304,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
 df_9_mus = result_list
  
-# 10_fin  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("fin"))) ##CHANGE SCENARIO HERE
+# 10_columnar  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("columnar"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-15", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -328,25 +336,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
-df_10_fin = result_list
+df_10_col = result_list
 
-# 11_con  ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("con"))) ##CHANGE SCENARIO HERE
+# 11_foliose  ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("foliose"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-15", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -359,25 +368,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
-df_11_con = result_list
+df_11_fol = result_list
 
-# 12_hed ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("hed"))) ##CHANGE SCENARIO HERE
+# 12_bushy ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("bushy"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-15", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -390,25 +400,26 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
 }
-df_12_hed = result_list
+df_12_bus = result_list
 
-# 13_bra ----
-sc.lab = as.vector(subset(scens.id, scenario %in% c("bra"))) ##CHANGE SCENARIO HERE
+# 13_branching ----
+sc.lab = as.vector(subset(scens.id, scenario %in% c("branching"))) ##CHANGE SCENARIO HERE
 id = sc.lab$id
 scens = sc.lab$scenario
-name = sc.lab$names
+name = sc.lab$labels
 foldername = paste(id, scens, timesteps, "tss", runs, "runs", "2023-02-17", sep = "_") #CHANGE DATE HERE
 readfile = paste(sim.wd, foldername, sep="/")
 setwd(readfile)
@@ -421,14 +432,15 @@ for (run in seq(1,100)){
                      ts = ts,
                      id = paste(id, scens, sep="_"),
                      scenarios = name,
-                     # numcoveredcells= getnumcoveredcells(run, ts),
-                     # meansides = getnumcoveredcellssides(run, ts)/ws/ws,
-                     # meantop = meantopview(run,ts),
-                     # meantop_1 = meantopview_1(run,ts),
-                     # meantop_5 = meantopview_5(run,ts),
-                     # meantop_10 = meantopview_10(run,ts),
-                     meantop_1_15 = meantopview_1_15(run,ts),
-                     meantop_1_20 = meantopview_1_20(run,ts))
+                     coral_cover = coralcover(run,ts),
+                     linear_rugosity = lin_rugosity(run,ts),
+                     surface_rugosity = sur_rugosity(run,ts),
+                     fractal_dimension = fracdim(run,ts), 
+                     shelter_volume = shelt_vol(run,ts),
+                     demersal_shelter = dem_shelt(run,ts),
+                     pelagic_shelter_1_15 = pel_shelter_1_15(run,ts),
+                     pelagic_shelter_2 = pel_shelter_2(run, ts),
+                     size_dependent = size_dep(run,ts))
     result_list = rbind(result_list, df)
   }
   print(run)
@@ -437,13 +449,14 @@ df_13_bra = result_list
 
 #####################################################################################################
 
-df_metrics = rbind(df_1_all.10, df_2_bot.5, df_3_top.5)
-df_metrics = rbind(df_4_enc, df_5_fle, df_6_dig, df_7_cor, df_8_tab,
-                   df_9_mus, df_10_fin, df_11_con, df_12_hed, df_13_bra) #1 ft only
+df_metrics = rbind(df_1_max.div, df_2_simple, df_3_complex)
+df_metrics_1fts = rbind(df_4_enc, df_5_hem, df_6_dig, df_7_cor, df_8_tab,
+                   df_9_mus, df_10_col, df_11_fol, df_12_bus, df_13_bra) # monospecific community types only
 
 # saving outputs
-setwd(met.output)
+setwd(output)
 write.csv(df_metrics, file = "df_metrics.csv", row.names = F)
+write.csv(df_metrics_1fts, file = "df_metrics_1fts.csv", row.names = F)
 
 
 
