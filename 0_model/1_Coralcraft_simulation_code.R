@@ -1,19 +1,17 @@
 # Coralcraft - A functional-structural coral model
 # Model code
-# this code works with R Studio v4.0
+# this code works with R Studio v4.0-4.3.0
 
 # Authors
 # Michael Renton
 # Anna K Cresswell
 # Daphne Oh
 
-# Set your working directory
-work.dir = setwd("./Coralcraft/0_model") #set work directory to location where 0_model is 
-sim.wd = paste(work.dir, "1_simulation_output", sep="/") #for model simulation output
-out.wd = paste(work.dir,"2_output_analysis", sep="/") #for output analysis
-script = paste(out.wd,"1_scripts", sep="/") 
-output = paste(out.wd, "2_output", sep="/") 
-setwd(work.dir)
+# Set your working directory to where the Coralcraft github folder is
+
+sim.wd = paste("0_model/1_simulation_output", sep="/") #for model simulation output
+out.wd = paste("0_model/2_output_analysis", sep="/") #for output analysis
+
 
 # for export naming ----
 version = paste(Sys.Date())
@@ -24,7 +22,7 @@ library(scatterplot3d)
 
 # 1. set parameters ----
 # set simulation parameters ----
-runs = 100 # how many times to run the simulation
+runs = 3 # how many times to run the simulation
 timesteps = 52*5  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
@@ -66,11 +64,11 @@ start.res = 1 # resources each colony starts with
 #Light_depth = Light_surface x e^(-k*depth)
 
 # 2. source growth form information ----
-source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
-load(file="ftcelllist") # load growth forms
-scens.id=read.csv("scenarios_id.csv") #load scenarios/community types
-scens.csv=read.csv("scenarios.csv", header=T) #load morphological composition of scenarios
-fts=read.csv("growth_forms.csv") #load coral morphologies
+source('0_model/1_coral_morphology_architecture.R') ## need to run this once to load the growth forms
+load(file="0_model/ftcelllist") # OR load pre-existing growth forms
+scens.id=read.csv("0_model/scenarios_id.csv") #load scenarios/community types
+scens.csv=read.csv("0_model/scenarios.csv", header=T) #load morphological composition of scenarios
+fts=read.csv("0_model/growth_forms.csv") #load coral morphologies
 
 # select scenario
 sc.label = as.vector(subset(scens.id, scenario %in% c("max.div"))) ##change scenarios here
@@ -83,14 +81,10 @@ sel.fts <- as.numeric(na.omit(as.vector(unlist(sel.fts))))
 labels = as.vector(subset(fts, id %in% sel.fts))
 
 # make new folder with name giving parameters for automatically saving outputs ----
-setwd(sim.wd)
-dir.create(paste(id, scens, timesteps, "tss", runs, "runs", version, sep = "_")) 
-foldername = paste(id, scens, timesteps, "tss", runs, "runs", version, sep = "_")
+dir.create(paste0(sim.wd, "/", id, scens, timesteps, "tss", runs, "runs", version)) 
+foldername = paste0(sim.wd, "/", id, scens, timesteps, "tss", runs, "runs", version)
 #note, sometimes the long name strings can cause issues, so remove information not needed if start getting errors here
 
-# set the working directory to be this new folder
-thisoutput = paste(sim.wd, foldername, sep="/")
-setwd(thisoutput)
 
 # plotting parameters ----
 draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
@@ -565,13 +559,13 @@ legend('topleft',c(as.character(ftypes$names),'dead'),col=1:6,lty=1:6, cex = 0.3
  print(colonymap) 
  
  ### output colony structure - saving 100x100 environment for further analysis
-if (ts == 1) save(light,dead,world , file = paste(id, scens, "worlds",ts,run, sep = "_")) #saves world files
-if (ts%%13==0) save(light,dead,world , file = paste(id, scens, "worlds",ts,run, sep = "_")) #
+if (ts == 1) save(light,dead,world , file = paste0(foldername, "/", id, scens, "worlds",ts,run)) #save first timestep world files
+if (ts%%13==0) save(light,dead,world , file = paste0(foldername, "/", id, scens, "worlds",ts,run)) #save world file ever 13 timesteps
  
   
 }# End of simulation loop
 
 # Save scores of cells, cover and no. colonies
-write.csv(ftypessaveall, paste(id, scens, "run", run, ".csv", sep = "_"), row.names =F)
+write.csv(ftypessaveall, paste0(foldername, "/", id, scens, "run", run, ".csv"), row.names =F)
 paste("ftypessaveall exported")
 } # End of multiple runs loop
