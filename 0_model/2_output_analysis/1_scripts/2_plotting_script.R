@@ -1,32 +1,30 @@
 # Code for plotting
 
-# this script sources read_output.R for data manipulation needed for plots 
+# this script sources read_df.R for data manipulation needed for plots 
 
 #################################
-version = paste(Sys.Date())
 timesteps = 52*5
 runs = 100
 
-work.dir = paste("~") #set main work directory (i.e. 0_model)
-sim.wd = paste(work.dir,"1_simulations", sep="/") #set simulation wd
-sim.output = paste(sim.wd,"3_output", sep="/") #directory to world files
-met.wd = paste(work.dir,"2_metrics", sep="/") #set metrics wd
-met.script = paste(met.wd,"1_scripts", sep="/") #metrics script
-met.output = paste(met.wd, "2_output", sep="/") #metrics output
-plots = paste(work.dir, "3_plots", sep="/")
+## set work directory
+work.dir = setwd("./Coralcraft/0_model") #set work directory to location where 0_model is 
+sim.wd = paste(work.dir, "1_simulation_output", sep="/") #for model simulation output
+out.wd = paste(work.dir,"2_output_analysis", sep="/") #for output analysis
+script = paste(out.wd,"1_scripts", sep="/") 
+output = paste(out.wd, "2_output", sep="/") 
+setwd(work.dir)
 
 ## load csv files & plotting parameters
-setwd(met.script)
-source("plot_par.R")
-source("read_output.R")
+source(paste0(script, "/plot_parameters.R"))
+source(paste0(script, "/read_df.R"))
 ################################################################################################################
 ###### STRUCTURAL COMPLEXITY 
 ### 1. DIVERSITY COMMUNITY TYPES
 # LINEAR RUGOSITY ----
 p1 = ggplot()+
-  stat_summary(data = df1, aes(x=coral.cover, y=lin_rugos, colour=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=linear_rugosity, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", show.legend = F, alpha = 0.5) +
-  stat_summary(data = df1, aes(x=coral.cover, y=lin_rugos, fill=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=linear_rugosity, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, geom = "ribbon",
                alpha=0.3, colour = NA, show.legend = F) +
   scale_linetype_manual(values=linetype1, name = "Diversity scenarios")+
@@ -45,9 +43,9 @@ p1 = ggplot()+
 
 # SURFACE RUGOSITY ----
 p11 = ggplot()+
-  stat_summary(data = df1, aes(x=coral.cover, y=sur_rugos, colour=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=surface_rugosity, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha =0.5, show.legend = F) +
-  stat_summary(data = df1, aes(x=coral.cover, y=sur_rugos, fill=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=surface_rugosity, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
                geom = "ribbon", alpha=0.3, colour = NA, show.legend = F) +
   scale_linetype_manual(values=linetype1, name = "Diversity scenarios")+
@@ -85,18 +83,18 @@ p111 = ggplot()+
   geom_line(data=df11, aes(x=coral.cover, y=fracdim, colour=scenarios, group = scenarios), size=size_pt, show.legend = F)
 
 
-### 2. MONOSPECIFIC COMMUNITY TYPES
+### 2. MONOSPECIFIC COMMUNITY TYPES----
 # LINEAR RUGOSITY ----
 p2 = ggplot()+
-  stat_summary(data = df2, aes(x=coral.cover, y=lin_rugos, colour=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=linear_rugosity, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", show.legend = F, alpha = 0.5) +
-  stat_summary(data = df2, aes(x=coral.cover, y=lin_rugos, fill=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=linear_rugosity, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, geom = "ribbon", 
                alpha=0.3, colour = NA, show.legend = F) +
-  scale_linetype_manual(values=linetype2[2:11], name = "Monospecific scenarios")+ 
-  scale_size_manual(values = linesize2[2:11], name = "Monospecific scenarios")+ 
-  scale_colour_manual(values = colpal2[2:11], name = "Monospecific scenarios") +
-  scale_fill_manual(values = colpal2[2:11], name = "Monospecific scenarios")+
+  scale_linetype_manual(values=linetype2, name = "Monospecific scenarios")+ 
+  scale_size_manual(values = linesize2, name = "Monospecific scenarios")+ 
+  scale_colour_manual(values = colpal2, name = "Monospecific scenarios") +
+  scale_fill_manual(values = colpal2, name = "Monospecific scenarios")+
   labs(x = NULL)+
   labs(y = "Linear rugosity")+
   ggtitle("-")+
@@ -108,15 +106,15 @@ p2 = ggplot()+
 
 # SURFACE RUGOSITY ----
 p22 = ggplot()+
-  stat_summary(data = df2, aes(x=coral.cover, y=sur_rugos, colour=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=surface_rugosity, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha = 0.5, show.legend = F) +
-  stat_summary(data = df2, aes(x=coral.cover, y=sur_rugos, fill=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=surface_rugosity, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
                geom = "ribbon", alpha=0.3, colour = NA, show.legend = F) +
-  scale_linetype_manual(values=linetype2[2:11], name = "Monospecific scenarios")+ 
-  scale_size_manual(values = linesize2[2:11], name = "Monospecific scenarios")+ 
-  scale_colour_manual(values = colpal2[2:11], name = "Monospecific scenarios") +
-  scale_fill_manual(values = colpal2[2:11], name = "Monospecific scenarios")+
+  scale_linetype_manual(values=linetype2, name = "Monospecific scenarios")+ 
+  scale_size_manual(values = linesize2, name = "Monospecific scenarios")+ 
+  scale_colour_manual(values = colpal2, name = "Monospecific scenarios") +
+  scale_fill_manual(values = colpal2, name = "Monospecific scenarios")+
   labs(x = NULL)+
   labs(y = "Surface rugosity")+
   ggtitle("-")+
@@ -152,9 +150,9 @@ p222 = ggplot()+
 ### 1. DIVERSITY COMMUNITY TYPES 
 # SHELTER VOLUME ----
 s1 = ggplot()+
-  stat_summary(data = df1, aes(x=coral.cover, y=sheltervol, colour=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=shelter_volume, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha=0.5, show.legend = T) +
-  stat_summary(data = df1, aes(x=coral.cover, y=sheltervol, fill=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=shelter_volume, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
                geom = "ribbon", alpha=0.3, colour = NA, show.legend = T) +
   scale_linetype_manual(values=linetype1, name = "Diversity scenarios")+ 
@@ -172,9 +170,9 @@ s1 = ggplot()+
 
 # DEMERSAL SHELTER ----
 s11 = ggplot()+
-  stat_summary(data = df1, aes(x=coral.cover, y=meansides, colour=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=demersal_shelter, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha = 0.5, show.legend = T) +
-  stat_summary(data = df1, aes(x=coral.cover, y=meansides, fill=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=demersal_shelter, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
                geom = "ribbon", alpha=0.3, colour = NA, show.legend = T) +
   scale_linetype_manual(values=linetype1, name = "Diversity scenarios")+ #only for 1fts
@@ -193,11 +191,10 @@ s11 = ggplot()+
 
 # PELAGIC SHELTER ----
 s111 = ggplot()+
-  stat_summary(data = subset(df.long, height %in% "1-15cm"), aes(x=coral.cover, y=meanshelter, colour=scenarios , group=scenarios, 
+  stat_summary(data = df1, aes(x=coral.cover, y=pelagic_shelter_1_15, colour=scenarios , group=scenarios, 
                                                                  linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha = 0.5, show.legend=F) +
-  stat_summary(data = subset(df.long, height %in% "1-15cm"), aes(x=coral.cover, y=meanshelter, fill=scenarios , group=scenarios,
+  stat_summary(data = df1, aes(x=coral.cover, y=pelagic_shelter_1_15, fill=scenarios , group=scenarios,
                                                                  linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, geom = "ribbon", alpha=0.3, colour = NA, show.legend = F) +
-  # facet_grid(col = vars(height), scales = "free_y")+
   scale_linetype_manual(values=linetype1, name = "Diversity scenarios")+
   scale_size_manual(values = linesize1, name = "Diversity scenarios")+ 
   scale_colour_manual(values = colpal1, name = "Diversity scenarios") +
@@ -217,15 +214,15 @@ s111 = ggplot()+
 ### 2. MONOSPECIFIC COMMUNITY TYPE 
 # SHELTER VOLUME ----
 s2 = ggplot()+
-  stat_summary(data = df2, aes(x=coral.cover, y=sheltervol, colour=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=shelter_volume, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha=0.5) +
-  stat_summary(data = df2, aes(x=coral.cover, y=sheltervol, fill=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=shelter_volume, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
                geom = "ribbon", alpha=0.3, colour = NA, show.legend = T) +
-  scale_linetype_manual(values=linetype2[2:11], name = "Monospecific scenarios")+ 
-  scale_size_manual(values = linesize2[2:11], name = "Monospecific scenarios")+ 
-  scale_colour_manual(values = colpal2[2:11], name = "Monospecific scenarios") +
-  scale_fill_manual(values = colpal2[2:11], name = "Monospecific scenarios")+
+  scale_linetype_manual(values=linetype2, name = "Monospecific scenarios")+ 
+  scale_size_manual(values = linesize2, name = "Monospecific scenarios")+ 
+  scale_colour_manual(values = colpal2, name = "Monospecific scenarios") +
+  scale_fill_manual(values = colpal2, name = "Monospecific scenarios")+
   labs(x = NULL)+
   labs(y = NULL)+
   scale_y_continuous(breaks = seq(0,140, by = 20))+
@@ -238,15 +235,15 @@ s2 = ggplot()+
 
 # DEMERSAL SHELTER ----
 s22 = ggplot()+
-  stat_summary(data = df2, aes(x=coral.cover, y=meansides, colour=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=demersal_shelter, colour=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun = mean, geom = "point", show.legend = T) +
-  stat_summary(data = df2, aes(x=coral.cover, y=meansides, fill=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=demersal_shelter, fill=scenarios , group=scenarios,
                                linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
                geom = "ribbon", alpha=0.3, colour = NA, show.legend = T) +
-  scale_linetype_manual(values=linetype2[2:11], name = "Monospecific scenarios")+ #only for 1fts
-  scale_size_manual(values = linesize2[2:11], name = "Monospecific scenarios")+ #only for 1fts
-  scale_colour_manual(values = colpal2[2:11], name = "Monospecific scenarios") +
-  scale_fill_manual(values = colpal2[2:11], name = "Monospecific scenarios")+
+  scale_linetype_manual(values=linetype2, name = "Monospecific scenarios")+ #only for 1fts
+  scale_size_manual(values = linesize2, name = "Monospecific scenarios")+ #only for 1fts
+  scale_colour_manual(values = colpal2, name = "Monospecific scenarios") +
+  scale_fill_manual(values = colpal2, name = "Monospecific scenarios")+
   labs(x = NULL)+
   labs(y = NULL)+
   ggtitle("-")+
@@ -259,16 +256,15 @@ s22 = ggplot()+
 
 # PELAGIC SHELTER ----
 s222 = ggplot()+
-  stat_summary(data = subset(df.long2, height %in% "1-15cm"), aes(x=coral.cover, y=meanshelter, colour=scenarios , group=scenarios, 
+  stat_summary(data = df2, aes(x=coral.cover, y=pelagic_shelter_1_15, colour=scenarios , group=scenarios, 
                                                                   linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha = 0.3, show.legend=T) +
-  stat_summary(data = subset(df.long2, height %in% "1-15cm"), aes(x=coral.cover, y=meanshelter, fill=scenarios , group=scenarios,
+  stat_summary(data = df2, aes(x=coral.cover, y=pelagic_shelter_1_15, fill=scenarios , group=scenarios,
                                                                   linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, geom = "ribbon", alpha=0.3, 
                colour = NA, show.legend = T) +
-  # facet_grid(col = vars(height))+
-  scale_linetype_manual(values=linetype2[2:13], name = "Monospecific scenarios")+
-  scale_size_manual(values = linesize2[2:13], name = "Monospecific scenarios")+
-  scale_colour_manual(values = colpal2[2:13], name = "Monospecific scenarios") +
-  scale_fill_manual(values = colpal2[2:13], name = "Monospecific scenarios")+
+  scale_linetype_manual(values=linetype2, name = "Monospecific scenarios")+
+  scale_size_manual(values = linesize2, name = "Monospecific scenarios")+
+  scale_colour_manual(values = colpal2, name = "Monospecific scenarios") +
+  scale_fill_manual(values = colpal2, name = "Monospecific scenarios")+
   labs(x = NULL,
        y = NULL)+
   ggtitle("-")+
@@ -276,43 +272,3 @@ s222 = ggplot()+
   theme2+
   geom_line(data=subset(df.long22, height %in% "1-15cm"), aes(x=coral.cover, y=meanshelter, colour=scenarios , group=scenarios), size=size_pt) 
 #################################################################################################
-## Size-dependent shelter
-## 1 . DIVERSITY COMMUNITY TYPES ----
-j1 = ggplot()+
-  stat_summary(data = juv1_long, aes(x=coralcover, y=mres, colour=scenarios , group=scenarios,
-                                     linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha=0.5, show.legend = F) +
-  stat_summary(data = juv1_long, aes(x=coralcover, y=mres, fill=scenarios , group=scenarios,
-                                     linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
-               geom = "ribbon", alpha=0.3, colour = NA, show.legend = F) +
-  facet_wrap(predsize~preysize, nrow=1)+
-  scale_linetype_manual(values=linetype1)+
-  scale_size_manual(values = linesize1)+
-  scale_colour_manual(values = colpal1) +
-  scale_fill_manual(values = colpal1)+
-  labs(x = NULL)+
-  labs(y = NULL)+
-  # ggtitle("For 3cm juvenile fish")+
-  theme1+
-  coord_cartesian(ylim = c(0,45))+
-  theme(axis.text.x = element_blank())+
-  geom_line(data=juv1_long1, aes(x=coral.cover, y=mres, colour=scenarios , group=scenarios), size=size_pt,show.legend = F) 
-
-## 2 . MONOSPECIFIC COMMUNITY TYPES ----
-j2 = ggplot()+
-  stat_summary(data = juv2_long, aes(x=coralcover*100, y=mres, colour=scenarios , group=scenarios,
-                                     linetype=scenarios, size=scenarios), fun = mean, geom = "point", alpha=0.5, show.legend = F) +
-  stat_summary(data = juv2_long, aes(x=coralcover*100, y=mres, fill=scenarios , group=scenarios,
-                                     linetype=scenarios, size=scenarios), fun.min = se.min, fun.max = se.max, 
-               geom = "ribbon", alpha=0.3, colour = NA, show.legend = F) +
-  facet_wrap(predsize~preysize, nrow =1)+
-  scale_linetype_manual(values=linetype2[2:13])+
-  scale_size_manual(values = linesize2[2:13])+
-  scale_colour_manual(values = colpal2[2:13]) +
-  scale_fill_manual(values = colpal2[2:13])+
-  labs(x = NULL)+
-  labs(y = NULL)+
-  # ggtitle("Juvenile Protection")+
-  theme2+ 
-  theme(axis.text.x = element_text(size=16))+
-  coord_cartesian(ylim = c(0,45))+
-  geom_line(data=juv2_long1, aes(x=coral.cover*100, y=mres, colour=scenarios , group=scenarios), size=size_pt, show.legend = F) 

@@ -1,5 +1,5 @@
-# 1_simulations 
-For model simulations and saving of model output
+# 1_simulation_output 
+For saving of model output
 
-# 2_metrics 
+# 2_output_analysis 
 For metrics calculations which can only be conducted after running simulations

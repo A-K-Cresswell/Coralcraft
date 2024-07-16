@@ -8,11 +8,11 @@
 # Daphne Oh
 
 # Set your working directory
-work.dir = paste("./") #set work directory to location where script is 
-sim.wd = paste(work.dir, "1_simulations", sep="/") #for model simulation wd
-met.wd = paste(work.dir,"2_Metrics", sep="/") #for metric calculation wd
-script = paste(met.wd,"1_Scripts", sep="/") 
-output = paste(met.wd, "1_Outputs", sep="/") 
+work.dir = setwd("./Coralcraft/0_model") #set work directory to location where 0_model is 
+sim.wd = paste(work.dir, "1_simulation_output", sep="/") #for model simulation output
+out.wd = paste(work.dir,"2_output_analysis", sep="/") #for output analysis
+script = paste(out.wd,"1_scripts", sep="/") 
+output = paste(out.wd, "2_output", sep="/") 
 setwd(work.dir)
 
 # for export naming ----
@@ -68,12 +68,12 @@ start.res = 1 # resources each colony starts with
 # 2. source growth form information ----
 source('1_Coral_Morphology_10_NEW.R') ## need to run this once to load the growth forms
 load(file="ftcelllist") # load growth forms
-scens.id=read.csv("scenarios_id.csv") #load scenarios
+scens.id=read.csv("scenarios_id.csv") #load scenarios/community types
 scens.csv=read.csv("scenarios.csv", header=T) #load morphological composition of scenarios
-fts=read.csv("growth forms.csv") ## DAPH TO INVESTIGATE IF NEEDED
+fts=read.csv("growth_forms.csv") #load coral morphologies
 
 # select scenario
-sc.label = as.vector(subset(scens.id, scenario %in% c("all.10"))) ##change scenarios here
+sc.label = as.vector(subset(scens.id, scenario %in% c("max.div"))) ##change scenarios here
 id = sc.label$id
 scens = sc.label$scenario
 
@@ -93,7 +93,7 @@ thisoutput = paste(sim.wd, foldername, sep="/")
 setwd(thisoutput)
 
 # plotting parameters ----
-draw = 0 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
+draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
 save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
 drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
 r3dDefaults$windowRect = c(50,50,500,500) # increase size of rgl window for better resolution when saving
@@ -148,8 +148,8 @@ for (run in 1:runs){ # multiple simulation runs
   
   # set up functional types information ----
   nfts = length(ftcelllist) # set number of functional groups (e.g. tabular, columnar, massive, encrusting)
-  ftypes = data.frame(names = c("encrusting", "flexihem", "digitate", "corymbose", "tabular",
-                                "mushroom", "fingers", "cone", "hedgehog", "branching"))  #new morphologies
+  ftypes = data.frame(names = c("encrusting", "flexihemispherical", "digitate", "corymbose", "tabular",
+                                "mushroom", "columnar", "foliose", "bushy", "branching"))  #new morphologies
   ftypes$ftnum = 1:nrow(ftypes)
   ftypes$resource.to.growth = 1 # this can be modified to change growth rates
   ftsinc_list = labels$name # select which functional types to include
