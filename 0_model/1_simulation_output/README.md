@@ -1,1 +1,1 @@
-folders will contain model out (including world files and .csv file)
+folders will contain model output (including world files and .csv file)
