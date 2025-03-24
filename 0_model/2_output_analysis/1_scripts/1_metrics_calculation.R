@@ -2,6 +2,9 @@
 
 # this script was used to analyse output files from structural complexity and shelter investigation (Oh et al. 2025)
 
+# this script reads output files saved in 1_simulation_output folder. 
+# output folders should be named in the following format: [community type id]_[community type]_[timesteps]_tss_[no. of runs]_run
+
 # LAST UPDATED: 24-03-2025
 # Author: Daphne Oh
 
