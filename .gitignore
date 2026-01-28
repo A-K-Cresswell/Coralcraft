@@ -1,10 +1,8 @@
 *.xlsx
 *.Rdata
 *.Rda
-*.png
 *.pdf
 *.nc
-*.gif
 0_model/1_simulation_output/
 .Rhistory
 
