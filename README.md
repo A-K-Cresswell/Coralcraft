@@ -1,7 +1,7 @@
 # Coralcraft: A 3D Functional-Structural Coral Community Model
 
 <p align="center">
-  <img src="images_gifs/AppendixG-NL-IHanimation.gif" alt="Coralcraft Growth Simulation" width="700px">
+  <img src="images_gifs/AppendixF-NL-NHanimation.gif" alt="Coralcraft Growth Simulation" width="700px">
 </p>
 
 **Coralcraft** is a mechanistic agent-based simulation model built in **R** that combines functional components, such as photosynthesis and vulnerability to disturbance, with a dynamic representation of a set of distinct 3D coral colony morphologies growing and competing for space and light. 
