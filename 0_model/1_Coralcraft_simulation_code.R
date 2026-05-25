@@ -22,7 +22,7 @@ library(scatterplot3d)
 
 # 1. set parameters ----
 # set simulation parameters ----
-runs = 3 # how many times to run the simulation
+runs = 1 # how many times to run the simulation
 timesteps = 52*5  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
 ws = 100 # world size (cm)
 maxdepth = 1 #(m) # this parameter is not used again
@@ -31,20 +31,19 @@ n.initial.colonies = 20  # how many corals in the beginning - initial size is on
                          # Change value to 18 for Functional Redundancy scenarios
 
 # set spawning parameters ----
-randomrecruits = 0 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
-spawn.freq = 99999 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
-nnewrecruits= 0 # how many new corals each spawn (could make random)
+randomrecruits = 1 # if set to 1 random allocation of growth forms, else allocation a probability of the number of live cells of each colony.
+spawn.freq = 52 # how frequently (in timesteps) does spawning occur (set to high number for no spawning)
+nnewrecruits= 5 # how many new corals each spawn (could make random)
 
 # set disturbance parameters ----
-randomdist = "random" # fixed or random disturbance intensity and frequency?
+randomdist = "fixed" # fixed or random disturbance intensity and frequency?
 # intensity 
 if(randomdist == "fixed") disturbance.intensity.low = c(20,20,20) else disturbance.intensity.low = exp(rnorm(1000,log(20),0.5)) # how intense is the disturbance (a smaller number is a bigger disturbance) 
 if(randomdist == "fixed") disturbance.intensity.high = c(1.5,1.5,1.5) else disturbance.intensity.high = exp(rnorm(1000,log(1.5),0.5)) # how intense is the disturbance (a smaller number is a bigger disturbance) 
-# frequency
-frequent = 26
-infrequent = 52*5  #originally 52*5
+
+# disturbance frequency -- set to large number for no disturbances
 freq.low = 99999 # 99999 OR frequent OR infrequent
-freq.high = 99999 # 99999 OR frequent OR infrequent
+freq.high = 350 # 99999 OR frequent OR infrequent
 
 # background mortality paramters ----
 background.mort = 0 # base probability 99% chance of surviving a year
@@ -88,9 +87,9 @@ foldername = paste0(sim.wd, "/", id, scens, timesteps, "tss", runs, "runs", vers
 
 # plotting parameters ----
 draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
-save3D = 0 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
+save3D = 1 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
 drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
-r3dDefaults$windowRect = c(50,50,500,500) # increase size of rgl window for better resolution when saving
+r3dDefaults$windowRect = c(50,50,1500,1500) # increase size of rgl window for better resolution when saving with the latter two numbers
 
       # To save with new orientation of rgl window:
       # Open rgl and move to desired orientation then save with below
@@ -106,9 +105,11 @@ colnames(uM3) = c("V1", "V2", "V3", "V4")
 rownames(uM3) = c("[1,]", "[2,]", "[3,]", "[4,]")
 # shade the sides of the world
 indices <- c( 1, 2, 3, 4 )
-verticesfloor <- c(0, 0, 0, 1.0, 100, 0, 0, 1.0, 100,  100, 0, 1.0, 0,  100, 0, 1.0)
-verticesback <- c(0,  100, 0, 1.0,100,  100, 0, 1.0, 100, 100, 100, 1.0, 0, 100, 100, 1.0)
-verticesside <- c(100,  100, 0, 1.0, 100,  0, 0, 1.0, 100, 0, 100, 1.0,100, 100, 100, 1.0)
+verticesfloor <- c(0, 0, 0, 1.0,  100, 0, 0, 1.0,  100, 100, 0, 1.0,  0, 100, 0, 1.0)
+
+verticesback  <- c(0, 100, 0, 1.0,  100, 100, 0, 1.0,  100, 100, 50, 1.0,  0, 100, 50, 1.0)
+
+verticesside  <- c(100, 100, 0, 1.0,  100, 0, 0, 1.0,  100, 0, 50, 1.0,  100, 100, 50, 1.0)
 
 # plot light
 light = array(rep(light.level * light.atten^((ws-1):0), each=ws*ws), dim=c(ws,ws,ws)) # this instantly sets up initial light through the world
@@ -176,6 +177,8 @@ for (run in 1:runs){ # multiple simulation runs
     print(paste("there are", nrow(colonymap), "colonies in the world", sep = " "))
     print(paste('run', run))
     print(paste('time step', ts)) 
+    
+    dist_text = "" # text to be added to plot
     
     # Light ----
     for (iii in 1:nlooplight){
@@ -441,6 +444,7 @@ for (run in 1:runs){ # multiple simulation runs
     # Disturbance low intensity fixed OR random ----
   if ((randomdist == "fixed" & ts%%freq.low == 0 & nrow(colonymap) >0 ) | (randomdist != "fixed" & runif(1) < (1/freq.low) & nrow(colonymap) >0) ) { # run this code when timestep is a multiple of set fixed frequency, or in the random case, make a random selection around this
       print(paste("low intensity ", randomdist))
+      dist_text = " (low intensity disturbance)" # Update the text tracking label**
       colonymap$csf = NA
       for (i in colonymap$colonyid) {  # loop through colony ids, these are what is stored in the world
         profile = (apply(world == i, c(2,3), any))
@@ -476,6 +480,8 @@ for (run in 1:runs){ # multiple simulation runs
   if ((randomdist == "fixed" & (ts+freq.high/2)%%freq.high == 0 & nrow(colonymap) >0) | (randomdist != "fixed" & runif(1) < (1/freq.high) & nrow(colonymap) >0) ) {
  # high intensity disturbances are set to occur at halfway intervals between the low intensity for fixed case
         print(paste("high intensity",randomdist ))
+        dist_text = " (high intensity disturbance)" # Update the text tracking label**
+    
         colonymap$csf = NA
         for (i in colonymap$colonyid) {  # loop through colony ids, these are what is stored in the world
           profile = (apply(world == i, c(2,3), any))
@@ -497,7 +503,7 @@ for (run in 1:runs){ # multiple simulation runs
 
         if (nrow(colonyremove )>0){
           thisfatesrec = colonyremove[,1:9] 
-          thisfatesrec$fate="low"
+          thisfatesrec$fate="high"
           thisfatesrec$deathtime=ts
           fatesrec = rbind(fatesrec ,thisfatesrec )
           nlooplight = 50
@@ -516,13 +522,28 @@ for (run in 1:runs){ # multiple simulation runs
     ftss = unlist(sapply(ids , function(thisid) {
       colonymap$ft[colonymap$colonyid == thisid]
     }))
+    
+    # 1. Clear previous frame
+    clear3d() 
+    
+    # 2. Grab your working base view and cleanly spin it 90 degrees around the Z-axis
+    # (pi / 2 radians equals exactly 90 degrees)
+    rotated_view = rotate3d(par3d("userMatrix"), pi/4, 0, 0, 1)
+    par3d(userMatrix = rotated_view)
+    
+    # 3. Render elements
     spheres3d(loc[,1],loc[,2],loc[,3],color=colpal[ftss], alpha=5)
     shade3d(qmesh3d(verticesfloor, indices),color='black')
     shade3d(qmesh3d(verticesback, indices),color='darkgrey')
     shade3d(qmesh3d(verticesside, indices),color='grey')
-    text3d(-6,-6,0,paste('Time step', ts))
+    
+    # 4. Text overlays
+    text3d(-6,-6,0,paste0('Time step ', ts, dist_text))    
+    # Places 'Coralcraft' centered horizontally at the back edge (x=50, y=100) at height z=50
+    text3d(60, 100, 60, "Coralcraft", cex = 1.5, color = "black", font = 2)
+    
     if (save3D == 1) {
-      rgl.snapshot(paste("00", ts, "png", sep="."))
+      rgl.snapshot(paste0(foldername, "/00", ts, ".png"))
     }
      rgl.close()
   }

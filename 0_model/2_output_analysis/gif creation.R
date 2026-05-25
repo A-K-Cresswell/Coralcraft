@@ -43,10 +43,10 @@ img <- mixedsort(img)
 gif <- img %>% 
   image_read() %>% # reads each path file
   image_join() %>% # joins image
-  image_animate(fps=20) # animates, can opt for number of loops
+  image_animate(fps=20, loop=0) # animates, set loop=0 for infinite looping
   
 setwd(preso)
-image_write(gif, "1_preso.gif")  # write to current dir
+image_write(gif, "1_GIF.gif")  # write to current dir
 
 
   

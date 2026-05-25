@@ -3,6 +3,8 @@
 *.Rda
 *.pdf
 *.nc
+*.png
 0_model/1_simulation_output/
 .Rhistory
 
+.Rproj.user
