@@ -45,7 +45,7 @@ gif <- img %>%
   image_join() %>% # joins image
   image_animate(fps=20, loop=0) # animates, set loop=0 for infinite looping
   
-setwd(preso)
+#setwd(preso)
 image_write(gif, "1_GIF.gif")  # write to current dir
 
 

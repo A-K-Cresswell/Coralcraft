@@ -89,7 +89,7 @@ foldername = paste0(sim.wd, "/", id, scens, timesteps, "tss", runs, "runs", vers
 draw = 1 # if set to 1, will plot in 3D each timestep - not currently set up (see figure script)
 save3D = 1 # if set to 1, will save 3D plot in each timestep - not currently set up (see figure script)
 drawscatter = 0 # will plot and save a scatterplot - not currently set up (see figure script)
-r3dDefaults$windowRect = c(50,50,1500,1500) # increase size of rgl window for better resolution when saving with the latter two numbers
+r3dDefaults$windowRect = c(50,50,750,750) # increase size of rgl window for better resolution when saving with the latter two numbers
 
       # To save with new orientation of rgl window:
       # Open rgl and move to desired orientation then save with below
