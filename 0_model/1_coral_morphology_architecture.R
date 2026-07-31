@@ -11,7 +11,7 @@ library(rgl)
 # This script is a source file. It introduces all possible functional forms, and, based on the functional type, specifies the possible cells the functional type may grow into, as referenced to a starting cell.
 
 #----------------------------------------------------------------------------------------
-ws = 100
+#ws = 100
 
 ftcelllist=list() # make an empty list
 #allcells = data.frame(expand.grid(x=(-ws/2):(ws/2),y=(-ws/2):(ws/2),z=1:depth)) #ws/2 puts in the middle of the world

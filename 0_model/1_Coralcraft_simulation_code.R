@@ -24,8 +24,8 @@ library(scatterplot3d)
 # set simulation parameters ----
 runs = 1 # how many times to run the simulation
 timesteps = 52*5  # the number of timesteps in each simulation, e.g. 52 weeks * 100 years
-ws = 100 # world size (cm)
-maxdepth = 1 #(m) # this parameter is not used again
+ws = 300 # world size (cm)
+maxdepth = 1 #(m) # this parameter is not used 
 mindepth = 0 #(m) # used to calc top of world light level
 n.initial.colonies = 20  # how many corals in the beginning - initial size is one block each (i.e. 1cm x 1cm)
                          # Change value to 18 for Functional Redundancy scenarios
@@ -105,11 +105,11 @@ colnames(uM3) = c("V1", "V2", "V3", "V4")
 rownames(uM3) = c("[1,]", "[2,]", "[3,]", "[4,]")
 # shade the sides of the world
 indices <- c( 1, 2, 3, 4 )
-verticesfloor <- c(0, 0, 0, 1.0,  100, 0, 0, 1.0,  100, 100, 0, 1.0,  0, 100, 0, 1.0)
+verticesfloor <- c(0, 0, 0, 1.0,  ws, 0, 0, 1.0,  ws, ws, 0, 1.0,  0, ws, 0, 1.0)
 
-verticesback  <- c(0, 100, 0, 1.0,  100, 100, 0, 1.0,  100, 100, 50, 1.0,  0, 100, 50, 1.0)
+verticesback  <- c(0, ws, 0, 1.0,  ws, ws, 0, 1.0,  ws, ws, 50, 1.0,  0, ws, 50, 1.0)
 
-verticesside  <- c(100, 100, 0, 1.0,  100, 0, 0, 1.0,  100, 0, 50, 1.0,  100, 100, 50, 1.0)
+verticesside  <- c(ws, ws, 0, 1.0,  ws, 0, 0, 1.0,  ws, 0, 50, 1.0,  ws, ws, 50, 1.0)
 
 # plot light
 light = array(rep(light.level * light.atten^((ws-1):0), each=ws*ws), dim=c(ws,ws,ws)) # this instantly sets up initial light through the world
