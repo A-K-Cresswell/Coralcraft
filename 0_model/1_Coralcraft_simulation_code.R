@@ -119,17 +119,26 @@ scens.csv = read.csv("0_model/scenarios.csv", header=T)
 fts = data.frame(id = 1:length(ftnames), name = ftnames)
 
 ## choose which functional types to include, in one of two ways:
-## (a) set selected.fts below to a vector of names, e.g.
-##     c("encrusting","tabular") - bypasses the scenario csv entirely
-## (b) leave selected.fts as NULL to use a named scenario from
-##     scenarios_id.csv / scenarios.csv instead (as before)
-# e.g. c("encrusting", "tabular"), or NULL to use the scenario csv below
-selected.fts = NULL
+## (a) [base case, default] selected.fts is a vector of names - runs
+##     directly with no CSV involved. Defaults to all 10 types; edit to
+##     e.g. c("encrusting","tabular") for a custom quick subset.
+## (b) [advanced] set selected.fts to NULL below to instead use a named
+##     scenario from scenarios_id.csv / scenarios.csv - useful once you
+##     have several reusable multi-type community compositions to switch
+##     between
+selected.fts = ftnames
 
 if (!is.null(selected.fts)) {
   labels = data.frame(name = selected.fts)
   id = "custom"
-  scens = paste(selected.fts, collapse="-")
+  # keep the folder/file name short and safe (long joined names can exceed
+  # Windows' path length limit and break save()) - list names directly for
+  # a small subset, otherwise just record how many types were included
+  if (length(selected.fts) <= 3) {
+    scens = paste(selected.fts, collapse="-")
+  } else {
+    scens = paste0(length(selected.fts), "fts")
+  }
 } else {
   ## select scenario
   ## change scenarios here

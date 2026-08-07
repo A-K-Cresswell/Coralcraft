@@ -6,7 +6,9 @@
 
 *Coralcraft* is a mechanistic agent-based simulation model built in **R** that combines functional components, such as photosynthesis and vulnerability to disturbance, with a dynamic representation of a set of distinct 3D coral colony morphologies growing and competing for space and light. 
 
-The voxel-based architecture naturally mirrors the modular growth of real-world coral polyps, resulting from the iteration of the single unit: the polyp. The modelled ‘environment’ is bounded by the bottom ($z = 1$, seafloor) and top planes (e.g. $z = 100$ cm, water surface), which serve as user-specified limits of growth. The smallest spatial unit in ***Coralcraft*** is a **$1\text{ cm}^3$ voxel** governed by rules of growth and light attenuation. A standard simulation consists of $1,000,000$ voxels (equivalent to $1\text{ m}^3$), though this is customisable. To eliminate edge effects, the sides of the environment are ‘wrapped’ in a torus, effectively simulating a larger area with a heterogeneous coral community under homogeneous environmental conditions. The model operates on a discrete one-week time step (52 steps per year).
+Although not perfectly scale-matched, the voxel-based architecture naturally mirrors the modular growth of real-world corals, which results from the iteration of the single unit: the polyp. The modelled ‘environment’ is bounded by the bottom ($z = 1$, seafloor) and top planes (e.g. $z = 100$ cm, water surface), which serve as user-specified limits of growth. The smallest spatial unit in ***Coralcraft*** is a **$1\text{ cm}^3$ voxel** governed by rules of growth and light attenuation. A standard simulation consists of $1,000,000$ voxels (equivalent to $1\text{ m}^3$), though this is customisable with user-specified x,y, and z dimensions. To eliminate edge effects, the sides of the environment are ‘wrapped’ in a torus, effectively simulating a larger area with a heterogeneous coral community under homogeneous environmental conditions. The model operates on a discrete one-week time step (52 steps per year).
+
+> **Want to run the model yourself?** See **[`0_model/README.md`](0_model/README.md)** for step-by-step setup and usage instructions.
 
 ---
 
@@ -57,4 +59,4 @@ The model calculates a wide range of community metrics:
 * **Ecology:** Shelter availability for demersal/pelagic predators and four variations of size-dependent predator/prey shelter.
 
 ---
-*Refer to `0_model` and further `README.md` files for implementation details.*
+**Refer to [`0_model/README.md`](0_model/README.md) and further `README.md` files for implementation details.**
